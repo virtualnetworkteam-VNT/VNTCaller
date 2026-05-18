@@ -18,13 +18,15 @@ jobs:
       - name: Build APK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
-          wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
-          unzip -q gradle-8.4-bin.zip
-          ./gradle-8.4/bin/gradle assembleDebug --no-daemon
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          yes | sdkmanager --licenses 2>/dev/null || true
+          sdkmanager "build-tools;34.0.0" "platforms;android-34"
+          curl -L https://services.gradle.org/distributions/gradle-8.4-bin.zip -o gradle.zip
+          unzip -q gradle.zip
+          ./gradle-8.4/bin/gradle assembleDebug --no-daemon --stacktrace 2>&1
 
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: VNTCaller-debug
           path: app/build/outputs/apk/debug/app-debug.apk
