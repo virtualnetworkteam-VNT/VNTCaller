@@ -5,12 +5,37 @@
     android:padding="32dp" android:background="#0f172a">
     <TextView android:text="VNT" android:textSize="48sp" android:textColor="#818cf8"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"/>
+    <TextView android:text="AI CALLER" android:textSize="12sp" android:textColor="#4a6080"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"/>
+    
+    <TextView android:text="SELECT SIM TO MONITOR:" android:textSize="11sp"
+        android:textColor="#4a6080" android:letterSpacing="0.1"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"/>
+    
+    <RadioGroup android:id="@+id/simGroup"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginBottom="24dp">
+        <RadioButton android:id="@+id/sim1"
+            android:text="SIM 1 (Physical)"
+            android:textColor="#e8f0f8"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"/>
+        <RadioButton android:id="@+id/sim2"
+            android:text="SIM 2 (eSIM)"
+            android:textColor="#818cf8"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </RadioGroup>
+    
     <Switch android:id="@+id/enableSwitch"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="Enable AI Answering" android:textColor="#ffffff"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="24dp"/>
+    
     <TextView android:id="@+id/status"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textColor="#4a6080" android:textSize="13sp" android:gravity="center"/>
+        android:textColor="#4a6080" android:textSize="13sp"
+        android:gravity="center" android:lineSpacingExtra="6dp"/>
 </LinearLayout>
