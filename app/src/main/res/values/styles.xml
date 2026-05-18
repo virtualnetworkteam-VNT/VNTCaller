@@ -3,6 +3,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">#6366f1</item>
         <item name="colorPrimaryDark">#0f172a</item>
+        <item name="colorAccent">#8b5cf6</item>
         <item name="android:windowBackground">#0f172a</item>
     </style>
 </resources>

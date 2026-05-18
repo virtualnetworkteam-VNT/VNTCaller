@@ -1,19 +1,23 @@
-plugins { id "com.android.application" }
+plugins { id 'com.android.application' }
 android {
-    namespace "com.vnt.caller"
+    namespace 'com.vnt.caller'
     compileSdk 34
     defaultConfig {
         applicationId "com.vnt.caller"
-        minSdk 26; targetSdk 34
-        versionCode 1; versionName "1.0"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
     }
+    buildTypes { release { minifyEnabled false } }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 }
 dependencies {
-    implementation "androidx.appcompat:appcompat:1.6.1"
-    implementation "com.squareup.okhttp3:okhttp:4.12.0"
-    implementation "org.java-websocket:Java-WebSocket:1.5.6"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'org.java-websocket:Java-WebSocket:1.5.6'
 }

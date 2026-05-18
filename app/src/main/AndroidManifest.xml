@@ -3,14 +3,19 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <application android:allowBackup="true" android:label="VNT Caller"
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
+    <application
+        android:allowBackup="true"
+        android:label="VNT Caller"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -19,7 +24,8 @@
         <service android:name=".CallService"
             android:foregroundServiceType="microphone"
             android:exported="false"/>
-        <receiver android:name=".CallReceiver" android:exported="true">
+        <receiver android:name=".CallReceiver"
+            android:exported="true">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.PHONE_STATE"/>
             </intent-filter>
@@ -29,5 +35,14 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <service android:name=".CallAnswerService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service"/>
+        </service>
     </application>
 </manifest>
