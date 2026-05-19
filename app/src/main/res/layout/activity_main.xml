@@ -1,20 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:gravity="center"
-    android:padding="32dp" android:background="#0f172a">
-    <TextView android:text="VNT" android:textSize="48sp" android:textColor="#818cf8"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:letterSpacing="0.3" android:layout_marginBottom="8dp"/>
-    <TextView android:text="AI CALLER" android:textSize="14sp" android:textColor="#4a6080"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"/>
-    <Switch android:id="@+id/enableSwitch"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Enable AI Answering" android:textColor="#e8f0f8"
-        android:layout_marginBottom="32dp"/>
-    <TextView android:id="@+id/status"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textColor="#4a6080" android:textSize="13sp"
-        android:gravity="center" android:lineSpacingExtra="6dp"/>
+    android:orientation="vertical" android:background="@color/bg">
+
+    <!-- Top bar -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingStart="16dp" android:paddingEnd="16dp"
+        android:background="@color/panel">
+        <TextView android:text="VNT" android:textSize="14sp"
+            android:textColor="@color/accent" android:fontFamily="monospace"
+            android:letterSpacing="0.3" android:textStyle="bold"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <TextView android:id="@+id/tvUser" android:text="Ryan"
+            android:textColor="@color/muted" android:textSize="12sp"
+            android:fontFamily="monospace" android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <View android:id="@+id/statusDot"
+            android:layout_width="10dp" android:layout_height="10dp"
+            android:background="@drawable/dot_shape"/>
+    </LinearLayout>
+
+    <!-- AI Agent Card -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:padding="16dp"
+        android:background="@color/panel" android:gravity="center_vertical"
+        android:layout_marginTop="1dp">
+        <FrameLayout android:layout_width="56dp" android:layout_height="56dp"
+            android:layout_marginEnd="14dp">
+            <ImageView android:id="@+id/ivAgent"
+                android:layout_width="56dp" android:layout_height="56dp"
+                android:scaleType="centerCrop" android:background="@drawable/circle_bg"/>
+            <TextView android:id="@+id/tvAgentInitial" android:text="A"
+                android:textSize="22sp" android:textColor="@color/text"
+                android:gravity="center" android:layout_width="56dp"
+                android:layout_height="56dp"/>
+        </FrameLayout>
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/tvAgentName" android:text="Alias"
+                android:textColor="@color/text" android:textSize="16sp"
+                android:textStyle="bold" android:fontFamily="monospace"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/tvAgentRole" android:text="AI CEO — VNT"
+                android:textColor="@color/muted" android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <TextView android:id="@+id/tvUploadPic" android:text="📷"
+            android:textSize="20sp" android:padding="8dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- SIM Selection -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp"
+        android:background="@color/panel" android:layout_marginTop="1dp">
+        <TextView android:text="AI ANSWERING SIM" android:textSize="10sp"
+            android:textColor="@color/muted" android:letterSpacing="0.2"
+            android:fontFamily="monospace" android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioGroup android:id="@+id/rgSim" android:orientation="horizontal"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <RadioButton android:id="@+id/rbSim1" android:text="SIM 1"
+                android:textColor="@color/text" android:fontFamily="monospace"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <RadioButton android:id="@+id/rbSim2" android:text="SIM 2 (eSIM)"
+                android:textColor="@color/accent" android:fontFamily="monospace"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <RadioButton android:id="@+id/rbBoth" android:text="Both"
+                android:textColor="@color/text" android:fontFamily="monospace"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+        </RadioGroup>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+            <TextView android:text="Answer after rings:" android:textColor="@color/muted"
+                android:textSize="12sp" android:fontFamily="monospace"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button android:id="@+id/btnRingMinus" android:text="-"
+                android:layout_width="36dp" android:layout_height="36dp"
+                android:background="@drawable/btn_small" android:textColor="@color/text"
+                android:padding="0dp"/>
+            <TextView android:id="@+id/tvRings" android:text="3"
+                android:textColor="@color/text" android:textSize="16sp"
+                android:gravity="center" android:layout_width="40dp"
+                android:layout_height="wrap_content"/>
+            <Button android:id="@+id/btnRingPlus" android:text="+"
+                android:layout_width="36dp" android:layout_height="36dp"
+                android:background="@drawable/btn_small" android:textColor="@color/text"
+                android:padding="0dp"/>
+            <Switch android:id="@+id/swAI" android:layout_marginStart="16dp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Dialer -->
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp">
+
+        <TextView android:id="@+id/tvDialNumber"
+            android:text="" android:hint="Enter number..."
+            android:textSize="28sp" android:textColor="@color/text"
+            android:textColorHint="@color/muted" android:gravity="center"
+            android:fontFamily="monospace" android:layout_marginBottom="16dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <!-- Keypad -->
+        <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:columnCount="3" android:rowCount="4" android:layout_marginBottom="16dp">
+            <Button android:id="@+id/k1" android:text="1" style="@style/DialKey"/>
+            <Button android:id="@+id/k2" android:text="2" style="@style/DialKey"/>
+            <Button android:id="@+id/k3" android:text="3" style="@style/DialKey"/>
+            <Button android:id="@+id/k4" android:text="4" style="@style/DialKey"/>
+            <Button android:id="@+id/k5" android:text="5" style="@style/DialKey"/>
+            <Button android:id="@+id/k6" android:text="6" style="@style/DialKey"/>
+            <Button android:id="@+id/k7" android:text="7" style="@style/DialKey"/>
+            <Button android:id="@+id/k8" android:text="8" style="@style/DialKey"/>
+            <Button android:id="@+id/k9" android:text="9" style="@style/DialKey"/>
+            <Button android:id="@+id/kStar" android:text="*" style="@style/DialKey"/>
+            <Button android:id="@+id/k0" android:text="0" style="@style/DialKey"/>
+            <Button android:id="@+id/kHash" android:text="#" style="@style/DialKey"/>
+        </GridLayout>
+
+        <!-- Call buttons -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center">
+            <Button android:id="@+id/btnBackspace" android:text="⌫"
+                android:background="@drawable/btn_small" android:textColor="@color/muted"
+                android:textSize="18sp" android:layout_width="56dp" android:layout_height="56dp"
+                android:layout_marginEnd="24dp"/>
+            <Button android:id="@+id/btnCall" android:text="📞"
+                android:textSize="24sp" android:layout_width="72dp" android:layout_height="72dp"
+                android:background="@drawable/btn_call"/>
+            <Button android:id="@+id/btnClear" android:text="✕"
+                android:background="@drawable/btn_small" android:textColor="@color/muted"
+                android:textSize="18sp" android:layout_width="56dp" android:layout_height="56dp"
+                android:layout_marginStart="24dp"/>
+        </LinearLayout>
+    </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom logout -->
+    <TextView android:id="@+id/tvLogout" android:text="LOGOUT"
+        android:textColor="@color/muted" android:textSize="11sp"
+        android:fontFamily="monospace" android:gravity="center"
+        android:padding="12dp" android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

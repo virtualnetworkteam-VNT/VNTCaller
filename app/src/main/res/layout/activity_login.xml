@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center"
+    android:padding="40dp" android:background="@color/bg">
+
+    <View android:id="@+id/statusDot"
+        android:layout_width="12dp" android:layout_height="12dp"
+        android:background="@drawable/dot_shape"
+        android:layout_gravity="end" android:layout_marginBottom="8dp"/>
+
+    <TextView android:text="VNT" android:textSize="52sp"
+        android:textColor="@color/accent" android:fontFamily="monospace"
+        android:letterSpacing="0.3" android:textStyle="bold"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center" android:layout_marginBottom="4dp"/>
+
+    <TextView android:text="AI CALLER" android:textSize="11sp"
+        android:textColor="@color/muted" android:letterSpacing="0.3"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center" android:layout_marginBottom="48dp"/>
+
+    <EditText android:id="@+id/etUser"
+        android:hint="Email / Username" android:inputType="textEmailAddress"
+        android:background="@drawable/input_bg" android:padding="14dp"
+        android:textColor="@color/text" android:textColorHint="@color/muted"
+        android:fontFamily="monospace" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginBottom="12dp"/>
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+        <EditText android:id="@+id/etPass"
+            android:hint="Password" android:inputType="textPassword"
+            android:background="@drawable/input_bg" android:padding="14dp"
+            android:paddingEnd="48dp"
+            android:textColor="@color/text" android:textColorHint="@color/muted"
+            android:fontFamily="monospace" android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/tvShowPass" android:text="👁"
+            android:textSize="18sp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </FrameLayout>
+
+    <TextView android:id="@+id/tvError" android:text=""
+        android:textColor="@color/red" android:textSize="12sp"
+        android:gravity="center" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+        android:visibility="gone"/>
+
+    <Button android:id="@+id/btnLogin" android:text="LOGIN"
+        android:background="@drawable/btn_primary" android:textColor="@color/text"
+        android:fontFamily="monospace" android:letterSpacing="0.2"
+        android:layout_width="match_parent" android:layout_height="52dp"/>
+</LinearLayout>
