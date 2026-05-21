@@ -1,5 +1,15 @@
 plugins { id 'com.android.application' }
+
 android {
+    signingConfigs {
+        release {
+            storeFile file('../vnt-release-key.keystore')
+            storePassword 'VNT@keystore2025'
+            keyAlias 'vntworld'
+            keyPassword 'VNT@keystore2025'
+        }
+    }
+
     namespace 'com.vnt.caller'
     compileSdk 34
     defaultConfig {
@@ -9,7 +19,8 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    buildTypes { release { minifyEnabled false } }
+    buildTypes { release { minifyEnabled false
+            signingConfig signingConfigs.release } }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

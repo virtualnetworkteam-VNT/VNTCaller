@@ -23,9 +23,9 @@ jobs:
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
           curl -sL https://services.gradle.org/distributions/gradle-8.4-bin.zip -o gradle.zip
           unzip -q gradle.zip
-          ./gradle-8.4/bin/gradle assembleDebug --no-daemon --stacktrace
+          ./gradle-8.4/bin/gradle assembleRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
-          name: VNTCaller-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: VNT-release
+          path: app/build/outputs/apk/release/app-release.apk
