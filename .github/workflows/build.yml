@@ -1,4 +1,4 @@
-name: Build VNT Caller AAB
+name: Build VNT Caller
 on:
   push:
     branches: [ main ]
@@ -15,17 +15,22 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      - name: Build Release AAB
+      - name: Build Release AAB + APK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/build-tools/34.0.0:$PATH
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/build-tools/35.0.0:$PATH
           yes | sdkmanager --licenses 2>/dev/null || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
           curl -sL https://services.gradle.org/distributions/gradle-8.4-bin.zip -o gradle.zip
           unzip -q gradle.zip
-          ./gradle-8.4/bin/gradle bundleRelease --no-daemon
+          ./gradle-8.4/bin/gradle bundleRelease assembleRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: VNT-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VNT-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
