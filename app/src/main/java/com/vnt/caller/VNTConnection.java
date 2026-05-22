@@ -47,7 +47,7 @@ public class VNTConnection extends Connection {
                     @Override public void onMessage(String msg) {}
                     @Override public void onClose(int c, String r, boolean remote) {
                         stopAudio();
-                        if (remote) disconnect();
+                        if (remote) { setDisconnected(new DisconnectCause(DisconnectCause.REMOTE)); destroy(); }
                     }
                     @Override public void onError(Exception e) {
                         Log.e(TAG, "WS error: " + e.getMessage());
