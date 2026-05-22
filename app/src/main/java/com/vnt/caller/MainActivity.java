@@ -109,6 +109,7 @@ public class MainActivity extends Activity {
 
         // Start service
         startForegroundService(new Intent(this, CallService.class));
+        PhoneAccountSetup.register(this);
     }
 
     private void makeCall(String number, int simSlot) {
