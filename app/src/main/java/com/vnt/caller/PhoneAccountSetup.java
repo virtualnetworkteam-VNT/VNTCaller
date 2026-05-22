@@ -22,9 +22,7 @@ public class PhoneAccountSetup {
             TelecomManager tm = (TelecomManager) ctx.getSystemService(Context.TELECOM_SERVICE);
             PhoneAccountHandle handle = getHandle(ctx);
             PhoneAccount account = PhoneAccount.builder(handle, "VNT Caller")
-                .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
-                    PhoneAccount.CAPABILITY_CONNECTION_MANAGER |
-                    PhoneAccount.CAPABILITY_SELF_MANAGED)
+                .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
                 .setSupportedUriSchemes(java.util.Arrays.asList("tel", "sip"))
                 .build();
             tm.registerPhoneAccount(account);

@@ -26,7 +26,11 @@ public class MainActivity extends Activity {
         SharedPreferences prefs = getSharedPreferences("vnt_prefs", MODE_PRIVATE);
         
         // User info
-        ((TextView)findViewById(R.id.tvUser)).setText(auth.getString("user_name","User"));
+        String userName = auth.getString("user_name","User");
+        String userRole = auth.getString("user_role","user");
+        ((TextView)findViewById(R.id.tvUser)).setText(userName);
+        ((TextView)findViewById(R.id.tvAgentName)).setText(userName);
+        ((TextView)findViewById(R.id.tvAgentRole)).setText(userRole.toUpperCase() + " — VNT");
         
         // Status dot
         updateStatusDot();
