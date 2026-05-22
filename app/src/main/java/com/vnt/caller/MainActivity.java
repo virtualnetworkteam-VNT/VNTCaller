@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
         String userName = auth.getString("user_name","User");
         String userRole = auth.getString("user_role","user");
         ((TextView)findViewById(R.id.tvUser)).setText(userName);
-        ((TextView)findViewById(R.id.tvAgentName)).setText(userName);
+        ((TextView)findViewById(R.id.tvAgentName)).setText("Alias");
         ((TextView)findViewById(R.id.tvAgentRole)).setText(userRole.toUpperCase() + " — VNT");
 
         // Status dot
@@ -114,6 +114,14 @@ public class MainActivity extends Activity {
         // Start service
         startForegroundService(new Intent(this, CallService.class));
         PhoneAccountSetup.register(this);
+
+        // Prompt to set VNT as default phone app
+        TelecomManager tm = (TelecomManager) getSystemService(TELECOM_SERVICE);
+        if (tm != null && !getPackageName().equals(tm.getDefaultDialerPackage())) {
+            Intent defDialer = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
+            defDialer.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, getPackageName());
+            startActivity(defDialer);
+        }
     }
 
     private void makeCall(String number, int simSlot) {
