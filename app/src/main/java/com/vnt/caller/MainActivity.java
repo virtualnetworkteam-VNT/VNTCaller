@@ -31,6 +31,24 @@ public class MainActivity extends Activity {
         ((TextView)findViewById(R.id.tvUser)).setText(userName);
         ((TextView)findViewById(R.id.tvAgentName)).setText(userName);
         ((TextView)findViewById(R.id.tvAgentRole)).setText(userRole.toUpperCase() + " — VNT");
+
+        // Load profile photo — hide letter avatar
+        android.widget.ImageView ivPhoto = findViewById(R.id.ivUserPhoto);
+        String photoUrl = auth.getString("user_photo", "");
+        if (ivPhoto != null) {
+            if (!photoUrl.isEmpty()) {
+                new Thread(() -> {
+                    try {
+                        java.net.URL url = new java.net.URL(photoUrl);
+                        android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeStream(url.openStream());
+                        runOnUiThread(() -> { ivPhoto.setImageBitmap(bmp); ivPhoto.setVisibility(android.view.View.VISIBLE); });
+                    } catch (Exception ignored) {}
+                }).start();
+            } else { ivPhoto.setVisibility(android.view.View.GONE); }
+        }
+        // Hide the letter-avatar TextView entirely
+        android.view.View letterAvatar = findViewById(R.id.tvAvatarLetter);
+        if (letterAvatar != null) letterAvatar.setVisibility(android.view.View.GONE);
         
         // Status dot
         updateStatusDot();
