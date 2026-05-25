@@ -130,6 +130,14 @@ public class MainActivity extends Activity {
 
         // Start service
         startForegroundService(new Intent(this, CallService.class));
+        // AI outbound call handler
+        if (getIntent() != null && getIntent().getBooleanExtra("ai_call", false)) {
+            String number = getIntent().getData() != null ? getIntent().getData().getSchemeSpecificPart() : "";
+            if (!number.isEmpty()) {
+                final String n = number;
+                new Handler().postDelayed(() -> makeCall(n, 0), 1500);
+            }
+        }
         PhoneAccountSetup.register(this);
 
         // Prompt to set VNT as default phone app
