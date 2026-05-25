@@ -29,16 +29,4 @@ public class VNTConnectionService extends ConnectionService {
         conn.startAIBridge(req.getAddress().getSchemeSpecificPart());
         return conn;
     }
-
-    @Override
-    public Connection onCreateIncomingConnectionFailed(PhoneAccountHandle h, ConnectionRequest r) {
-        Log.e(TAG, "Incoming connection failed");
-        return null;
-    }
-
-    @Override
-    public Connection onCreateOutgoingConnectionFailed(PhoneAccountHandle h, ConnectionRequest r) {
-        Log.e(TAG, "Outgoing connection failed");
-        return null;
-    }
 }
