@@ -1,4 +1,5 @@
 package com.vnt.caller;
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -28,7 +29,7 @@ public class VNTInCallService extends InCallService {
         call.registerCallback(new Call.Callback() {
             @Override
             public void onStateChanged(Call c, int state) {
-                Log.i(TAG, "State changed: " + state);
+                Log.i(TAG, "State: " + state);
                 if (state == Call.STATE_RINGING) answerCall(c);
                 if (state == Call.STATE_ACTIVE) startBridge(c);
                 if (state == Call.STATE_DISCONNECTED || state == Call.STATE_DISCONNECTING) stopBridge();
@@ -39,7 +40,8 @@ public class VNTInCallService extends InCallService {
     }
 
     private void answerCall(Call call) {
-        try { call.answer(0); Log.i(TAG, "Answered"); } catch (Exception e) { Log.e(TAG, "Answer: " + e.getMessage()); }
+        try { call.answer(0); Log.i(TAG, "Answered"); }
+        catch (Exception e) { Log.e(TAG, "Answer: " + e.getMessage()); }
     }
 
     private void startBridge(Call call) {
@@ -48,7 +50,7 @@ public class VNTInCallService extends InCallService {
         String caller = "";
         try { caller = call.getDetails().getHandle().getSchemeSpecificPart(); } catch (Exception ignored) {}
         final String callerNum = caller;
-        Log.i(TAG, "Starting bridge for: " + callerNum);
+        Log.i(TAG, "Bridge starting for: " + callerNum);
 
         new Thread(() -> {
             try {
@@ -58,48 +60,84 @@ public class VNTInCallService extends InCallService {
                 socket = new Socket(BRIDGE_HOST, BRIDGE_PORT);
                 OutputStream out = socket.getOutputStream();
                 InputStream in = socket.getInputStream();
-                out.write((callerNum + "\n").getBytes()); out.flush();
+                out.write((callerNum + "\n").getBytes());
+                out.flush();
 
                 int bufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 2;
 
-                // VOICE_CALL captures both sides of cellular call
+                // Record call audio - VOICE_CALL captures both sides
                 recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL,
-                    SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufSize);
+                    SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, bufSize);
                 if (recorder.getState() != AudioRecord.STATE_INITIALIZED) {
                     recorder.release();
+                    // Fallback: VOICE_COMMUNICATION captures mic only
                     recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
-                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufSize);
+                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, bufSize);
                 }
 
+                // Player: USAGE_VOICE_COMMUNICATION injects into call uplink
+                // so the remote party (S25) can hear Alias
                 int playBuf = AudioTrack.getMinBufferSize(SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 2;
-                player = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SAMPLE_RATE,
-                    AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, playBuf, AudioTrack.MODE_STREAM);
+                player = new AudioTrack.Builder()
+                    .setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build())
+                    .setAudioFormat(new AudioFormat.Builder()
+                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                        .setSampleRate(SAMPLE_RATE)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                        .build())
+                    .setBufferSizeInBytes(playBuf)
+                    .setTransferMode(AudioTrack.MODE_STREAM)
+                    .build();
 
-                recorder.startRecording(); player.play();
+                recorder.startRecording();
+                player.play();
+                Log.i(TAG, "Bridge active - recorder state: " + recorder.getState());
 
+                // Read AI audio response and inject into call
                 new Thread(() -> {
                     byte[] buf = new byte[4096];
-                    try { int r; while (bridgeRunning && (r = in.read(buf)) > 0) player.write(buf,0,r); }
-                    catch (Exception ignored) {}
+                    try {
+                        int r;
+                        while (bridgeRunning && (r = in.read(buf)) > 0) {
+                            player.write(buf, 0, r);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Read: " + e.getMessage());
+                    }
                 }).start();
 
+                // Send call audio to AI bridge
                 byte[] buf = new byte[bufSize];
                 while (bridgeRunning) {
                     int r = recorder.read(buf, 0, buf.length);
-                    if (r > 0) { out.write(buf,0,r); out.flush(); }
+                    if (r > 0) {
+                        out.write(buf, 0, r);
+                        out.flush();
+                    }
                 }
-            } catch (Exception e) { Log.e(TAG, "Bridge: " + e.getMessage()); }
+            } catch (Exception e) {
+                Log.e(TAG, "Bridge: " + e.getMessage());
+            }
         }).start();
     }
 
     private void stopBridge() {
         bridgeRunning = false;
-        try { if (recorder != null) recorder.stop(); } catch (Exception ignored) {}
-        try { if (player != null) player.stop(); } catch (Exception ignored) {}
+        try { if (recorder != null) { recorder.stop(); recorder.release(); } } catch (Exception ignored) {}
+        try { if (player != null) { player.stop(); player.release(); } } catch (Exception ignored) {}
         try { if (socket != null) socket.close(); } catch (Exception ignored) {}
-        try { ((AudioManager)getSystemService(AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL); } catch (Exception ignored) {}
+        try {
+            AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+            am.setMode(AudioManager.MODE_NORMAL);
+        } catch (Exception ignored) {}
+        Log.i(TAG, "Bridge stopped");
     }
 
     @Override
