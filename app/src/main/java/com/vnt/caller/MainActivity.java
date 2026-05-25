@@ -93,16 +93,33 @@ public class MainActivity extends Activity {
             ((TextView)findViewById(R.id.tvDialNumber)).setText("");
         });
 
-        // Call button - select SIM
-        findViewById(R.id.btnCall).setOnClickListener(v -> {
-            String num = dialNumber.toString().trim();
-            if (num.isEmpty()) return;
-            // Show SIM selection dialog
-            String[] sims = {"SIM 1 (Physical)", "SIM 2 (eSIM)"};
-            new android.app.AlertDialog.Builder(this)
-                .setTitle("Select SIM to call")
-                .setItems(sims, (d, which) -> makeCall(num, which))
-                .show();
+        // Call/End button toggle
+        Button btnCall = findViewById(R.id.btnCall);
+        final boolean[] inCall = {false};
+        btnCall.setOnClickListener(v -> {
+            if (!inCall[0]) {
+                String num = dialNumber.toString().trim();
+                if (num.isEmpty()) return;
+                String[] sims = {"SIM 1", "SIM 2"};
+                new android.app.AlertDialog.Builder(this)
+                    .setTitle("Select SIM")
+                    .setItems(sims, (dl, which) -> {
+                        makeCall(num, which);
+                        inCall[0] = true;
+                        btnCall.setText("X");
+                        btnCall.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFE53935));
+                    }).show();
+            } else {
+                try {
+                    android.telecom.TelecomManager tm2 = (android.telecom.TelecomManager) getSystemService(TELECOM_SERVICE);
+                    tm2.endCall();
+                } catch (Exception ignored) {}
+                inCall[0] = false;
+                btnCall.setText("Call");
+                btnCall.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF4CAF50));
+                dialNumber.setLength(0);
+                ((TextView)findViewById(R.id.tvDialNumber)).setText("");
+            }
         });
 
         // Logout
