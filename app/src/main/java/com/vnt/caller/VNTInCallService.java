@@ -5,6 +5,9 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
 import android.telecom.Call;
 import android.telecom.InCallService;
 import android.util.Log;
@@ -24,10 +27,8 @@ public class VNTInCallService extends InCallService {
 
     @Override
     public void onCallAdded(Call call) {
-        Log.i(TAG, "Call added: " + call.getState());
         call.registerCallback(new Call.Callback() {
-            @Override
-            public void onStateChanged(Call c, int state) {
+            @Override public void onStateChanged(Call c, int state) {
                 if (state == Call.STATE_RINGING) answerCall(c);
                 if (state == Call.STATE_ACTIVE) startBridge(c);
                 if (state == Call.STATE_DISCONNECTED) stopBridge();
@@ -48,11 +49,10 @@ public class VNTInCallService extends InCallService {
         try { caller = call.getDetails().getHandle().getSchemeSpecificPart(); } catch (Exception ignored) {}
         final String callerNum = caller;
 
-        // Enable speakerphone so Alias voice goes through mic back to caller
         AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
         am.setMode(AudioManager.MODE_IN_CALL);
         am.setSpeakerphoneOn(true);
-        Log.i(TAG, "Speakerphone ON - bridge starting for: " + callerNum);
+        Log.i(TAG, "Bridge starting for: " + callerNum);
 
         new Thread(() -> {
             try {
@@ -65,13 +65,25 @@ public class VNTInCallService extends InCallService {
                 int bufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 2;
 
-                // Capture mic audio (picks up caller voice via speakerphone)
                 recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
                     SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufSize);
 
-                // Play Alias response through speaker loudly
-                // Speakerphone carries it back through mic to S25
+                // DISABLE AEC, NS, AGC - these cancel out Alias voice from speaker
+                int sessionId = recorder.getAudioSessionId();
+                if (AcousticEchoCanceler.isAvailable()) {
+                    AcousticEchoCanceler aec = AcousticEchoCanceler.create(sessionId);
+                    if (aec != null) { aec.setEnabled(false); Log.i(TAG, "AEC disabled"); }
+                }
+                if (NoiseSuppressor.isAvailable()) {
+                    NoiseSuppressor ns = NoiseSuppressor.create(sessionId);
+                    if (ns != null) { ns.setEnabled(false); Log.i(TAG, "NS disabled"); }
+                }
+                if (AutomaticGainControl.isAvailable()) {
+                    AutomaticGainControl agc = AutomaticGainControl.create(sessionId);
+                    if (agc != null) { agc.setEnabled(false); Log.i(TAG, "AGC disabled"); }
+                }
+
                 int playBuf = AudioTrack.getMinBufferSize(SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 2;
                 player = new AudioTrack.Builder()
@@ -90,9 +102,8 @@ public class VNTInCallService extends InCallService {
 
                 recorder.startRecording();
                 player.play();
-                Log.i(TAG, "Recording + playback started");
+                Log.i(TAG, "AEC disabled - recording + playback started");
 
-                // Play AI responses through speaker
                 new Thread(() -> {
                     byte[] buf = new byte[4096];
                     try {
@@ -103,15 +114,12 @@ public class VNTInCallService extends InCallService {
                     } catch (Exception e) { Log.e(TAG, "Playback: " + e.getMessage()); }
                 }).start();
 
-                // Stream mic to AI
                 byte[] buf = new byte[bufSize];
                 while (bridgeRunning) {
                     int r = recorder.read(buf, 0, buf.length);
                     if (r > 0) { out.write(buf, 0, r); out.flush(); }
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Bridge error: " + e.getMessage());
-            }
+            } catch (Exception e) { Log.e(TAG, "Bridge: " + e.getMessage()); }
         }).start();
     }
 
@@ -127,6 +135,5 @@ public class VNTInCallService extends InCallService {
         } catch (Exception ignored) {}
     }
 
-    @Override
-    public void onCallRemoved(Call call) { stopBridge(); }
+    @Override public void onCallRemoved(Call call) { stopBridge(); }
 }
