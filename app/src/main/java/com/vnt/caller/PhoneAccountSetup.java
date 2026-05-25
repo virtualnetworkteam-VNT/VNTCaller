@@ -1,8 +1,8 @@
 package com.vnt.caller;
 import android.content.ComponentName;
 import android.content.Context;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.Bundle;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -21,12 +21,18 @@ public class PhoneAccountSetup {
         try {
             TelecomManager tm = (TelecomManager) ctx.getSystemService(Context.TELECOM_SERVICE);
             PhoneAccountHandle handle = getHandle(ctx);
-            PhoneAccount account = PhoneAccount.builder(handle, "VNT Caller")
-                .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
+            PhoneAccount account = PhoneAccount.builder(handle, "VNT AI")
+                .setCapabilities(
+                    PhoneAccount.CAPABILITY_CALL_PROVIDER |
+                    PhoneAccount.CAPABILITY_CONNECTION_MANAGER |
+                    PhoneAccount.CAPABILITY_SUPPORTS_VIDEO_CALLING
+                )
                 .setSupportedUriSchemes(java.util.Arrays.asList("tel", "sip"))
                 .build();
             tm.registerPhoneAccount(account);
-            Log.i(TAG, "Phone account registered");
+            // Enable this account for calls
+            tm.setUserSelectedOutgoingPhoneAccount(handle);
+            Log.i(TAG, "Phone account registered and set as outgoing");
         } catch (Exception e) {
             Log.e(TAG, "Registration failed: " + e.getMessage());
         }
@@ -35,13 +41,12 @@ public class PhoneAccountSetup {
     public static void makeCall(Context ctx, String number) {
         try {
             TelecomManager tm = (TelecomManager) ctx.getSystemService(Context.TELECOM_SERVICE);
-            PhoneAccountHandle handle = getHandle(ctx);
-            android.os.Bundle extras = new android.os.Bundle();
-            extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle);
-            Uri uri = Uri.fromParts("tel", number, null);
-            tm.placeCall(uri, extras);
+            Bundle extras = new Bundle();
+            extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, getHandle(ctx));
+            tm.placeCall(Uri.fromParts("tel", number, null), extras);
+            Log.i(TAG, "Call placed to " + number);
         } catch (Exception e) {
-            Log.e(TAG, "Call failed: " + e.getMessage());
+            Log.e(TAG, "makeCall failed: " + e.getMessage());
         }
     }
 }
