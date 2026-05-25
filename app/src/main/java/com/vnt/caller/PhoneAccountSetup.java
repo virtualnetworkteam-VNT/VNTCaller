@@ -24,15 +24,12 @@ public class PhoneAccountSetup {
             PhoneAccount account = PhoneAccount.builder(handle, "VNT AI")
                 .setCapabilities(
                     PhoneAccount.CAPABILITY_CALL_PROVIDER |
-                    PhoneAccount.CAPABILITY_CONNECTION_MANAGER |
-                    PhoneAccount.CAPABILITY_SUPPORTS_VIDEO_CALLING
+                    PhoneAccount.CAPABILITY_CONNECTION_MANAGER
                 )
                 .setSupportedUriSchemes(java.util.Arrays.asList("tel", "sip"))
                 .build();
             tm.registerPhoneAccount(account);
-            // Enable this account for calls
-            tm.setUserSelectedOutgoingPhoneAccount(handle);
-            Log.i(TAG, "Phone account registered and set as outgoing");
+            Log.i(TAG, "Phone account registered");
         } catch (Exception e) {
             Log.e(TAG, "Registration failed: " + e.getMessage());
         }
