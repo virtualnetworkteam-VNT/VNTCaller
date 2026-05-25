@@ -48,7 +48,6 @@ public class VNTConnection extends Connection {
                     playBuf, AudioTrack.MODE_STREAM);
                 out.write((caller + "\n").getBytes());
 
-                out.write(header.getBytes());
                 out.flush();
                 recorder.startRecording();
                 player.play();
