@@ -5,7 +5,6 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
-import android.os.Handler;
 import android.telecom.Call;
 import android.telecom.InCallService;
 import android.util.Log;
@@ -29,10 +28,9 @@ public class VNTInCallService extends InCallService {
         call.registerCallback(new Call.Callback() {
             @Override
             public void onStateChanged(Call c, int state) {
-                Log.i(TAG, "State: " + state);
                 if (state == Call.STATE_RINGING) answerCall(c);
                 if (state == Call.STATE_ACTIVE) startBridge(c);
-                if (state == Call.STATE_DISCONNECTED || state == Call.STATE_DISCONNECTING) stopBridge();
+                if (state == Call.STATE_DISCONNECTED) stopBridge();
             }
         });
         if (call.getState() == Call.STATE_RINGING) answerCall(call);
@@ -40,8 +38,7 @@ public class VNTInCallService extends InCallService {
     }
 
     private void answerCall(Call call) {
-        try { call.answer(0); Log.i(TAG, "Answered"); }
-        catch (Exception e) { Log.e(TAG, "Answer: " + e.getMessage()); }
+        try { call.answer(0); } catch (Exception e) { Log.e(TAG, e.getMessage()); }
     }
 
     private void startBridge(Call call) {
@@ -50,13 +47,15 @@ public class VNTInCallService extends InCallService {
         String caller = "";
         try { caller = call.getDetails().getHandle().getSchemeSpecificPart(); } catch (Exception ignored) {}
         final String callerNum = caller;
-        Log.i(TAG, "Bridge starting for: " + callerNum);
+
+        // Enable speakerphone so Alias voice goes through mic back to caller
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        am.setMode(AudioManager.MODE_IN_CALL);
+        am.setSpeakerphoneOn(true);
+        Log.i(TAG, "Speakerphone ON - bridge starting for: " + callerNum);
 
         new Thread(() -> {
             try {
-                AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-                am.setMode(AudioManager.MODE_IN_COMMUNICATION);
-
                 socket = new Socket(BRIDGE_HOST, BRIDGE_PORT);
                 OutputStream out = socket.getOutputStream();
                 InputStream in = socket.getInputStream();
@@ -66,25 +65,18 @@ public class VNTInCallService extends InCallService {
                 int bufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 2;
 
-                // Record call audio - VOICE_CALL captures both sides
-                recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL,
+                // Capture mic audio (picks up caller voice via speakerphone)
+                recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
                     SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufSize);
-                if (recorder.getState() != AudioRecord.STATE_INITIALIZED) {
-                    recorder.release();
-                    // Fallback: VOICE_COMMUNICATION captures mic only
-                    recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
-                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, bufSize);
-                }
 
-                // Player: USAGE_VOICE_COMMUNICATION injects into call uplink
-                // so the remote party (S25) can hear Alias
+                // Play Alias response through speaker loudly
+                // Speakerphone carries it back through mic to S25
                 int playBuf = AudioTrack.getMinBufferSize(SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 2;
                 player = new AudioTrack.Builder()
                     .setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .build())
                     .setAudioFormat(new AudioFormat.Builder()
@@ -98,9 +90,9 @@ public class VNTInCallService extends InCallService {
 
                 recorder.startRecording();
                 player.play();
-                Log.i(TAG, "Bridge active - recorder state: " + recorder.getState());
+                Log.i(TAG, "Recording + playback started");
 
-                // Read AI audio response and inject into call
+                // Play AI responses through speaker
                 new Thread(() -> {
                     byte[] buf = new byte[4096];
                     try {
@@ -108,22 +100,17 @@ public class VNTInCallService extends InCallService {
                         while (bridgeRunning && (r = in.read(buf)) > 0) {
                             player.write(buf, 0, r);
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Read: " + e.getMessage());
-                    }
+                    } catch (Exception e) { Log.e(TAG, "Playback: " + e.getMessage()); }
                 }).start();
 
-                // Send call audio to AI bridge
+                // Stream mic to AI
                 byte[] buf = new byte[bufSize];
                 while (bridgeRunning) {
                     int r = recorder.read(buf, 0, buf.length);
-                    if (r > 0) {
-                        out.write(buf, 0, r);
-                        out.flush();
-                    }
+                    if (r > 0) { out.write(buf, 0, r); out.flush(); }
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Bridge: " + e.getMessage());
+                Log.e(TAG, "Bridge error: " + e.getMessage());
             }
         }).start();
     }
@@ -135,9 +122,9 @@ public class VNTInCallService extends InCallService {
         try { if (socket != null) socket.close(); } catch (Exception ignored) {}
         try {
             AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+            am.setSpeakerphoneOn(false);
             am.setMode(AudioManager.MODE_NORMAL);
         } catch (Exception ignored) {}
-        Log.i(TAG, "Bridge stopped");
     }
 
     @Override
