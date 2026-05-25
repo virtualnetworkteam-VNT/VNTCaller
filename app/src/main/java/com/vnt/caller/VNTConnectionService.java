@@ -12,9 +12,9 @@ public class VNTConnectionService extends ConnectionService {
         VNTConnection conn = new VNTConnection(getApplicationContext());
         conn.setAddress(req.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
         conn.setCallerDisplayName("VNT", TelecomManager.PRESENTATION_ALLOWED);
-        conn.setAudioModeIsVoip(true);
         conn.setActive();
-        conn.startAIBridge(req.getAddress().getSchemeSpecificPart());
+        String caller = req.getAddress().getSchemeSpecificPart();
+        conn.startAIBridge(caller);
         return conn;
     }
 
@@ -23,10 +23,10 @@ public class VNTConnectionService extends ConnectionService {
         Log.i(TAG, "Outgoing: " + req.getAddress());
         VNTConnection conn = new VNTConnection(getApplicationContext());
         conn.setAddress(req.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
-        conn.setAudioModeIsVoip(true);
         conn.setDialing();
         conn.setActive();
-        conn.startAIBridge(req.getAddress().getSchemeSpecificPart());
+        String number = req.getAddress().getSchemeSpecificPart();
+        conn.startAIBridge(number);
         return conn;
     }
 }
