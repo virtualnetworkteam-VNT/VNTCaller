@@ -151,14 +151,17 @@ public class MainActivity extends Activity {
 
     private void makeCall(String number, int simSlot) {
         try {
-            Uri uri = Uri.fromParts("tel", number, null);
-            Intent intent = new Intent(Intent.ACTION_CALL, uri);
-            // Try to select SIM slot
-            intent.putExtra("com.android.phone.extra.slot", simSlot);
-            intent.putExtra("slot", simSlot);
-            startActivity(intent);
+            PhoneAccountSetup.makeCall(this, number);
         } catch (Exception e) {
-            Toast.makeText(this, "Call failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            // Fallback to native
+            try {
+                android.net.Uri uri = android.net.Uri.fromParts("tel", number, null);
+                Intent intent = new Intent(Intent.ACTION_CALL, uri);
+                intent.putExtra("com.android.phone.extra.slot", simSlot);
+                startActivity(intent);
+            } catch (Exception e2) {
+                Toast.makeText(this, "Call failed: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
