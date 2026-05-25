@@ -36,9 +36,9 @@ public class VNTConnection extends Connection {
                 OutputStream out = socket.getOutputStream();
                 InputStream in = socket.getInputStream();
                 // Send caller ID
-                String header = caller + "
-";
-                out.write(header.getBytes());
+                out.write((caller + "\n").getBytes());
+
+
                 out.flush();
 
                 int bufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE,
