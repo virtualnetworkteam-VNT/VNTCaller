@@ -67,7 +67,7 @@
                 android:textColor="@color/text" android:fontFamily="monospace"
                 android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1"/>
-            <RadioButton android:id="@+id/rbSim2" android:text="SIM 2 (eSIM)"
+            <RadioButton android:id="@+id/rbSim2" android:text="SIM 2"
                 android:textColor="@color/accent" android:fontFamily="monospace"
                 android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1"/>
