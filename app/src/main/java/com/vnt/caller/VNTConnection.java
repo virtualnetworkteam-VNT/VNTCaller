@@ -46,8 +46,8 @@ public class VNTConnection extends Connection {
                 player = new AudioTrack(AudioManager.STREAM_VOICE_CALL, SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
                     playBuf, AudioTrack.MODE_STREAM);
-                String header = caller + 
-;
+                out.write((caller + "\n").getBytes());
+
                 out.write(header.getBytes());
                 out.flush();
                 recorder.startRecording();
