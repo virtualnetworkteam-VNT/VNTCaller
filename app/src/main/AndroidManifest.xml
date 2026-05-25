@@ -73,5 +73,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".BridgeReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.vnt.caller.START_BRIDGE"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
