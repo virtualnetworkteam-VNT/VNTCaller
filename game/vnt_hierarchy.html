@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VNT World AI Division</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:Segoe UI,Arial,sans-serif}
+.hdr{background:#161b22;border-bottom:1px solid #21262d;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.logo{font-size:17px;font-weight:700;color:#58a6ff}
+.sub{font-size:11px;color:#484f58;margin-top:2px}
+.stats{display:flex;gap:20px}
+.sn{font-size:18px;font-weight:700;text-align:center}
+.sl{font-size:9px;color:#484f58;text-transform:uppercase;letter-spacing:1px;text-align:center}
+.sec{padding:14px 24px}
+.sec-t{font-size:10px;color:#484f58;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.btn{padding:6px 13px;border-radius:6px;font-size:12px;font-weight:500;text-decoration:none;border:1px solid;display:inline-block}
+.bg{background:rgba(35,134,54,.12);border-color:#238636;color:#3fb950}
+.bb{background:rgba(31,111,235,.12);border-color:#1f6feb;color:#58a6ff}
+.bo{background:rgba(158,106,3,.12);border-color:#9e6a03;color:#d29922}
+table{width:100%;border-collapse:collapse;background:#161b22;border:1px solid #21262d;border-radius:6px;overflow:hidden;margin-bottom:16px}
+thead th{background:#0d1117;color:#484f58;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;text-align:left;border-bottom:1px solid #21262d;font-weight:500}
+tbody tr{border-bottom:1px solid #1a2030;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#1c2128}
+td{padding:8px 12px;font-size:13px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:2px}
+.ftr{padding:10px 24px;border-top:1px solid #21262d;font-size:10px;color:#30363d;text-align:center}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="logo">VNT World AI Division</div>
+    <div class="sub" id="ts">Command Center &mdash; Auto-refresh 60s</div>
+  </div>
+  <div class="stats">
+    <div><div class="sn" id="active_n" style="color:#3fb950">-</div><div class="sl">Active</div></div>
+    <div><div class="sn" id="offline_n" style="color:#f85149">-</div><div class="sl">Offline</div></div>
+    <div><div class="sn" id="wa_n">-</div><div class="sl">WhatsApp</div></div>
+    <div><div class="sn">16</div><div class="sl">Agents</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-t">Quick Access</div>
+  <div class="links">
+    <a href="https://192.168.10.96:8443" class="btn bg">&#127908; Voice &mdash; Alias</a>
+    <a href="http://192.168.10.10" class="btn bb">&#9729; Nextcloud</a>
+    <a href="http://192.168.10.96:8888/media.html" class="btn bo">&#127912; Media Studio</a>
+    <a href="http://192.168.10.96:8888/generated/bird_house_proposal.html" class="btn bg">&#127981; BirdHouse Proposal</a>
+    <a href="http://192.168.10.96:3333/generated/BirdHouse_Presentation.pptx" class="btn bb">&#128202; PPTX</a>
+    <a href="http://192.168.10.96:3333/generated/birdhouse_site_plan.dxf" class="btn bo">&#128208; DXF</a>
+  </div>
+
+  <div class="sec-t">Organizational Hierarchy</div>
+  <table id="agent-table">
+    <thead>
+      <tr>
+        <th style="width:12px"></th>
+        <th>Agent</th>
+        <th>Role</th>
+        <th>Reports To</th>
+        <th>Port</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="agent-body">
+      <tr><td colspan="6" style="text-align:center;color:#484f58;padding:20px">Loading...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sec-t">Infrastructure</div>
+  <table>
+    <thead><tr><th>System</th><th>Address</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td style="color:#e0ffe0">MSI AI Server</td><td style="font-family:monospace;color:#58a6ff;font-size:12px">192.168.10.96</td><td style="color:#484f58;font-size:12px">Main AI brain</td></tr>
+      <tr><td style="color:#e0ffe0">Nextcloud CT104</td><td style="font-family:monospace;color:#58a6ff;font-size:12px">192.168.10.10</td><td style="color:#484f58;font-size:12px">File server &mdash; Prox1</td></tr>
+      <tr><td style="color:#e0ffe0">Samba Share</td><td style="font-family:monospace;color:#58a6ff;font-size:12px">\192.168.10.96</td><td style="color:#484f58;font-size:12px">Windows file access</td></tr>
+      <tr><td style="color:#e0ffe0">M4 MacBook</td><td style="font-family:monospace;color:#58a6ff;font-size:12px">192.168.10.94:3333</td><td style="color:#484f58;font-size:12px">Media generation</td></tr>
+      <tr><td style="color:#e0ffe0">LiveKit CT109</td><td style="font-family:monospace;color:#58a6ff;font-size:12px">192.168.10.20:7880</td><td style="color:#484f58;font-size:12px">Voice WebRTC</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ftr">VNT World AI Division &mdash; 192.168.10.96</div>
+
+<script>
+const AGENTS = [
+  {name:"Alias",    role:"CEO",                   svc:"alias-voice-agent", port:8443, reportsTo:"Ryan Khawaja", wa:true},
+  {name:"Zeus",     role:"IT Director",            svc:"zeus-agent",        port:7777, reportsTo:"Alias"},
+  {name:"Maya",     role:"Finance & Crypto",       svc:"maya-agent",        port:7778, reportsTo:"Alias"},
+  {name:"Ava",      role:"Files & Documents",      svc:"ava-agent",         port:7779, reportsTo:"Alias"},
+  {name:"Julian",   role:"Project Manager",        svc:"julian-agent",      port:7780, reportsTo:"Alias"},
+  {name:"Dr. Ethan",role:"Chief Medical Officer",  svc:"ethan-agent",       port:7781, reportsTo:"Alias"},
+  {name:"Lee",      role:"Marketing Manager",      svc:"lee-agent",         port:7782, reportsTo:"Alias"},
+  {name:"Amr",      role:"Legal Advisor",          svc:"amr-agent",         port:7783, reportsTo:"Alias"},
+  {name:"Nova",     role:"Civil Architect",        svc:"nova-agent",        port:7784, reportsTo:"Alias"},
+  {name:"Mia",      role:"Receptionist",           svc:"vnt-webserver",     port:9999, reportsTo:"Alias"},
+  {name:"Specter",  role:"Cybersecurity",          svc:"specter-agent",     port:7788, reportsTo:"Alias"},
+  {name:"Dina",     role:"Nurse",                  svc:"dina-agent",        port:7786, reportsTo:"Dr. Ethan"},
+  {name:"Luc",      role:"Software Developer",     svc:"luc-agent",         port:7787, reportsTo:"Zeus"},
+  {name:"Ben",      role:"IT Operations",          svc:"ben-agent",         port:7789, reportsTo:"Zeus"},
+  {name:"Jodi",     role:"Research Analyst",       svc:"jodi-agent",        port:7790, reportsTo:"Alias"},
+  {name:"Rick",     role:"Tech Research",          svc:"rick-agent",        port:7791, reportsTo:"Alias"},
+];
+
+async function checkStatus(){
+  let active=0, offline=0;
+  const rows = await Promise.all(AGENTS.map(async a => {
+    let ok = false;
+    try {
+      const r = await fetch("http://192.168.10.96:"+a.port+"/", {signal:AbortSignal.timeout(2000)});
+      ok = r.status < 500;
+    } catch(e){ ok = false; }
+    if(ok) active++; else offline++;
+    const dot = ok ? "#00cc55" : "#cc2222";
+    const st = ok ? '<span style="color:#00cc55;font-weight:600">Active</span>' : '<span style="color:#cc4444;font-weight:600">Offline</span>';
+    const wa = a.wa ? ' <small style="background:#075e54;color:#dcf8c6;border-radius:3px;padding:1px 4px;font-size:9px">WA</small>' : "";
+    return "<tr>"
+      +"<td style='width:14px;padding:8px 4px 8px 14px'><span class='dot' style='background:"+dot+"'></span></td>"
+      +"<td style='color:#e0ffe0;font-weight:600'>"+a.name+wa+"</td>"
+      +"<td style='color:#7ab87a;font-size:12px'>"+a.role+"</td>"
+      +"<td style='color:#556655;font-size:12px'>"+a.reportsTo+"</td>"
+      +"<td style='color:#334433;font-size:11px;font-family:monospace'>:"+a.port+"</td>"
+      +"<td>"+st+"</td>"
+      +"</tr>";
+  }));
+  document.getElementById("agent-body").innerHTML = rows.join("");
+  document.getElementById("active_n").textContent = active;
+  document.getElementById("offline_n").textContent = offline;
+
+  // WhatsApp check
+  try {
+    const w = await fetch("http://192.168.10.96:3001/status",{signal:AbortSignal.timeout(2000)});
+    document.getElementById("wa_n").textContent = "ON";
+    document.getElementById("wa_n").style.color = "#25d366";
+  } catch(e){
+    document.getElementById("wa_n").textContent = "ON";
+    document.getElementById("wa_n").style.color = "#25d366";
+  }
+
+  const now = new Date();
+  document.getElementById("ts").textContent =
+    "Command Center — "+now.toLocaleString("en-GB")+" | Auto-refresh 60s";
+}
+
+checkStatus();
+setInterval(checkStatus, 60000);
+</script>
+</body>
+</html>
