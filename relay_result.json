@@ -1,1 +1,1 @@
-{"ts": "20260530_2025", "results": {"portal_syntax": "OK", "watchdog": "installed", "crontab": "added 2 entries", "api_health": "PASS online", "mia_v2": "OK", "openclaw_keys": "['gateway', 'channels', 'models', 'agents', 'tools', 'commands']", "mia_in_oc": "not found", "mempalace": "WRITTEN"}}
+{"ts": "20260530_2028", "results": {"keys": "['gateway', 'channels', 'models', 'agents', 'tools', 'commands']", "agents_type": "dict", "agents_count": 1, "agent_keys": "['defaults']", "mia_found": "not in dict", "dir_agents": "alias.md\nmain\nmain.json", "portal": "PASS online"}}
