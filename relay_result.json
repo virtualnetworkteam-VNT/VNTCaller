@@ -1,20 +1,19 @@
 {
-  "ts": "20260530_1649",
+  "ts": "20260530_1653",
   "results": {
-    "ct108_api": "FAIL 0",
-    "dashboard": "PASS 79887b",
-    "app": "PASS",
-    "msi_api_proxy": "FAIL 0",
-    "ct108_internal": "FAIL 0 <urlopen error timed out>b",
-    "ct108_api_health": "FAIL 0 <urlopen error timed out>b",
-    "vntworld_dashboard": "FAIL 0 timed outb",
-    "vntworld_app": "FAIL 0 timed outb",
-    "vntworld_api": "FAIL 0 timed outb",
-    "msi_portal": "FAIL 0 timed outb",
-    "msi_api": "FAIL 0 timed outb",
+    "msi_proxy": "FAIL 0",
+    "CT108_root": "FAIL 0 <urlopen error [Errno 111] Connection reb",
+    "CT108_dashboard": "FAIL 0 <urlopen error [Errno 111] Connection reb",
+    "CT108_api": "FAIL 0 <urlopen error [Errno 111] Connection reb",
+    "CT108_app": "FAIL 0 <urlopen error [Errno 111] Connection reb",
+    "vntworld_dash": "FAIL 0 HTTP Error 502: Bad Gatewayb",
+    "vntworld_app": "FAIL 0 HTTP Error 502: Bad Gatewayb",
+    "vntworld_api": "FAIL 0 HTTP Error 502: Bad Gatewayb",
+    "MSI_8888": "FAIL 0 timed outb",
     "nextcloud": "PASS 33702b",
-    "m4_api": "PASS",
-    "audio_ct108": "FAIL:HTTP Error 500: Internal Server Error",
-    "image_ct108": "PASS url=http://192.168.10.94:3333/file/img_20260"
+    "m4": "PASS",
+    "audio": "FAIL:<urlopen error [Errno 111] Connection re",
+    "image": "FAIL:<urlopen error [Errno 111] Connection re",
+    "ct108_concurrent": "FAIL 0"
   }
 }
