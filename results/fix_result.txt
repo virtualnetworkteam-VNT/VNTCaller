@@ -1,0 +1,35 @@
+=======================================================
+FIXING ALIAS + LANGGRAPH + DOWN SERVICES
+=======================================================
+
+[1] Installing LangGraph...
+  LangGraph: STILL FAILED: 
+
+[2] Diagnosing Alias voice agent...
+  Recent log: (self.server_address)
+May 30 09:50:34 ai python3[2053559]: OSError: [Errno 98] Address already in use
+May 30 09:50:34 ai systemd[1]: alias-voice-agent.service: Main process exited, code=exited, status=1/FAILURE
+May 30 09:50:34 ai systemd[1]: alias-voice-agent.service: Failed with result 'exit-code'.
+
+[3] Rewriting Alias with safe imports...
+  Alias rewritten: syntax valid, server binds first, LangGraph in background
+  Alias service: activating
+  Alias :8443: STILL DOWN
+
+[4] Starting down services...
+  mia-agent: inactive
+  alias-email-reader: inactive
+  vnt-portal: inactive
+  cf-tunnel: inactive
+  smbd: inactive
+
+[5] Re-testing agent ports...
+  Alias :8443: DOWN
+  Zeus :7777: DOWN
+  Maya :7778: OK
+  Mia :9999: DOWN
+
+[6] Cloudflare tunnel...
+  CF URL: not ready
+
+  LangGraph final: not installed
