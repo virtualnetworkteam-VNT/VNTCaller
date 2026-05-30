@@ -1,0 +1,20 @@
+=======================================================
+ALIAS GUARDIAN + RE-ENABLE BACKUP
+=======================================================
+
+[1] Re-enabling nightly backup...
+  nightly_backup: ON
+
+[2] Building Alias Guardian module...
+  Guardian module written
+  Guardian test: alive: True
+
+[3] Wiring Guardian into Argus...
+  Argus now guards Alias every 30s
+
+[4] LIVE GUARDIAN TEST - killing Alias to test auto-recovery...
+  Alias killed. Waiting 45s for Argus guardian to recover...
+  Alias after guardian: RECOVERED ✓
+
+[5] Final status...
+  Agents: 19/19
