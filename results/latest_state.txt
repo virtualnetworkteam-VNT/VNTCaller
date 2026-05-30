@@ -1,75 +1,54 @@
 =======================================================
-1TB DRIVE INVESTIGATION + BACKUP SIZING
+DAILY ROUTINE + BACKUP + TOGGLES
 =======================================================
+  Feature flags created: /mnt/vnt-data/FileServer/VNT_World_AI_Division/vnt_features.json
 
-[1] All disks:
-Filesystem      Size  Used Avail Use% Mounted on
-efivarfs        192K  144K   44K  77% /sys/firmware/efi/efivars
-/dev/nvme0n1p4  781G  131G  611G  18% /
-/dev/nvme0n1p1  296M   39M  258M  13% /boot/efi
-/dev/sda1       880G  144M  835G   1% /mnt/vnt-data
+[1] Building backup system...
+  First backup: OK: vnt_backup_2026-05-30_10-39.tar.gz (102KB)
 
-[2] Block devices:
-NAME          SIZE TYPE MOUNTPOINT
-sda         894.3G disk 
-└─sda1      894.3G part /mnt/vnt-data
-nvme0n1       1.9T disk 
-├─nvme0n1p1   300M part /boot/efi
-├─nvme0n1p2   128M part 
-├─nvme0n1p3 745.9G part 
-├─nvme0n1p4   794G part /
-├─nvme0n1p5 342.3G part 
-├─nvme0n1p6   974M part 
-└─nvme0n1p7  24.1G part
+[2] Building restore script...
+  Restore script ready: python3 /home/k/vnt-restore.py
 
-[3] /mnt mounts:
-total 20
-drwxr-xr-x  5 root root 4096 May 11 22:03 .
-drwxr-xr-x 23 root root 4096 Feb 20 04:05 ..
-drwxr-xr-x  2 root root 4096 May 11 22:03 nextcloud-alias
-drwxr-xr-x 17 k    k    4096 May 10 23:16 vnt-data
-drwxr-xr-x  2 root root 4096 Feb 21 03:26 vnt_data
----
-/dev/sda1 on /mnt/vnt-data type ext4 (rw,relatime)
+[3] Building daily routine...
+  Daily routine script ready
 
-[4] /mnt/vnt-data usage:
-144M	/mnt/vnt-data
+[4] Setting up daily timer (8 AM)...
+  Daily timer (8AM): active
+  Backup timer (2AM): active
 
-[5] VNT_World_AI_Division contents:
-total 392
-drwxrwxr-x 16 k k   4096 May 30 09:11 .
-drwxrwxr-x  7 k k   4096 May 18 20:30 ..
-drwxrwxr-x 12 k k   4096 May 10 23:16 Agents
--rw-rw-r--  1 k k   3078 May 30 09:25 alias_brain.json
-drwxrwxr-x  2 k k   4096 May 10 23:16 Apps
-drwxrwxr-x  3 k k   4096 May 27 00:17 backups
-drwxrwxr-x  2 k k   4096 May 10 23:16 Clients
-drwxrwxr-x  2 k k   4096 May 12 17:49 Credentials
-drwxrwxr-x  2 k k   4096 May 10 23:16 Documents
-drwxrwxr-x  2 k k   4096 May 27 19:05 generated_media
-drwxrwxr-x  2 k k   4096 May 10 23:16 Generated_Media
--rw-rw-r--  1 k k   2186 May 30 05:50 HANDOVER.md
-drwxrwxr-x  2 k k 
+[5] Test-running daily routine now...
+VNT DAILY ROUTINE REPORT
+========================================
+2026-05-30 10:39
 
-[6] Backup sizing (critical VNT files):
-  Agent scripts: 140K	total
-  Memory+configs: 300K	total
-  WhatsApp bot: 36K	/home/k/alias-baileys/index.js
-  Service units: 108K	total
+[1] CLAUDE ACCESS (relay):
+  Relay last active: 0 min ago OK
+[2] AGENTS:
+  19/19 up | all online
+[3] CHAIN OF COMMAND:
+  Alias->Zeus chain: OK
+[4] VNT DEVICES:
+  M4 Mac (192.168.10.94): online
+  Asusi7 (192.168.10.114): online
+  Prox1 (192.168.10.19): online
+  Prox2 (192.168.10.18): online
+  Nextcloud (192.168.10.10): online
+  Omada (192.168.10.5): online
+[5] SERVICES:
+  Portal: up
+  Web: up
+  Media: down
+  Nextcloud: up
+  smbd: active
+[6] ALIAS GROWTH:
+  Tasks completed: 0
+  Knowledge topics learned: 0
+  Code improvements logged: 0
+[7] BACKUP:
+  OK: vnt_backup_2026-05-30_10-39.tar.gz (104KB)
 
-[7] Free space on vnt-data:
-  /dev/sda1       880G  144M  835G   1% /mnt/vnt-data
-
-[8] Existing snapshots:
-total 20
-drwxr-xr-x  5 k k 4096 May 30 09:12 .
-drwxrwxr-x 16 k k 4096 May 30 09:11 ..
-drwxr-xr-x  2 k k 4096 May 30 09:12 post_2026-05-30_09-11
-drwxr-xr-x  3 k k 4096 May 30 09:11 pre_2026-05-30_09-11
-drwxr-xr-x  2 k k 4096 May 30 09:11 snap_2026-05-30_09.11
-
-[9] Ollama models (Alias growth storage):
-8.0K	/home/k/.ollama
-NAME                      ID              SIZE      MODIFIED     
-mistral-nemo:latest       e7e06d107c6c    7.1 GB    4 weeks ago     
-mistral:7b                6577803aa9a0    4.
+[6] Backup verification...
+total 116
+drwxr-xr-x  2 k k   4096 May 30 10:39 .
+drwxrwxr-x 17 k k   4096 May 30 10:39 ..
+-rw-r--r--  1 k k 106861 May 30 10:39 vnt_backup_2026-05-30_10-39.tar.gz
