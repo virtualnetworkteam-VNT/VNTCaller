@@ -1,49 +1,43 @@
 =======================================================
-KILLING STUCK PROCESSES + DIAGNOSING SERVICES
+FINAL FIX - PORTS, MISSING SCRIPTS, LANGGRAPH
 =======================================================
 
-[1] Killing stuck processes on agent ports...
-  Port 8443: killed 856562
-  Port 7777: killed 856053
-  Port 9999: killed 2369683
-  Port 8080: clear
-  Port 8888: clear
-  Port 7785: killed 855043
-  Orphaned processes killed
+[1] Stopping all agent services...
+  All stopped and killed
 
-[2] Diagnosing why services fail...
-  alias-voice-agent: activating
-    Error: e
-May 30 09:51:35 ai systemd[1]: alias-voice-agent.service: Main process exited, code=exited, status=1/FAILURE
-May 30 09:51:35 ai systemd[1]: alias-voice-agent.service: Failed with result 'exit-code'.
-  zeus-agent: active OK
-  mia-agent: inactive
-    Error: 
-  vnt-portal: inactive
-    Error: 
-  smbd: inactive
-    Error: 
+[2] Finding actual service paths...
+  zeus-agent: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/zeus-agent/zeus.py ; i
+  maya-agent: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/maya-agent.py ; ignore
+  mia-agent: 
 
-[3] Checking agent scripts...
-  alias: exists, syntax valid
-  zeus: MISSING FILE
-  mia: MISSING FILE
-  portal: MISSING FILE
+[3] Writing all agent scripts...
+  Wrote 15/15 agent scripts + fixed service paths
+  Mia agent written (voice set in reception logic)
 
-[4] Running Alias manually to capture error...
-  Manual run output: Alias SI-4.0 :8443
-Traceback (most recent call last):
-  File "/home/k/alias-voice-agent.py", line 158, in <module>
-    try:http.server.HTTPServer(('0.0.0.0',8443),H).serve_forever()
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/socketserver.py", line 457, in __init__
+[4] Fixing LangGraph...
+  LangGraph: FAILED: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+AttributeError: module 'la
 
-[5] Clean restart of core services...
-  alias-voice-agent: activating | HTTP DOWN
-  zeus-agent: active | HTTP DOWN
-  mia-agent: inactive | HTTP DOWN
+[5] Starting all services fresh...
 
-[6] LangGraph install (full output)...
-  Output: .12/site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2,>=1.4.0->langgraph) (3.4.7)
-Requirement already satisfied: urllib3<3,>=1.26 in /home/k/.local/lib/python3.12/site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2,>=1.4.0->langgraph) (2.7.0)
-  LangGraph: still not installed
+[6] Testing all ports...
+  Alias :8443: OK
+  Zeus :7777: DOWN
+  Maya :7778: OK
+  Ava :7779: OK
+  Julian :7780: OK
+  Ethan :7781: OK
+  Lee :7782: OK
+  Amr :7783: OK
+  Nova :7784: OK
+  Specter :7788: OK
+  Luc :7787: OK
+  Ben :7789: OK
+  Dina :7786: OK
+  Jodi :7790: OK
+  Rick :7791: OK
+  Mia :9999: DOWN
+
+  TOTAL: 14/16 agents responding
+  WhatsApp: 
