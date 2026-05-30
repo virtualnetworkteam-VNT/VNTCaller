@@ -1,34 +1,24 @@
 =======================================================
-FORCE FIX ZEUS + MIA SYSTEMD
+ZEUS + MIA AS USER SERVICES (no sudo needed)
 =======================================================
 
-[1] Finding all zeus unit files...
-  Zeus units found:
-/etc/systemd/system/multi-user.target.wants/zeus-monitor.service
-/etc/systemd/system/multi-user.target.wants/zeus-agent.service
-/etc/systemd/system/zeus-monitor.service
-/etc/systemd/system/zeus-agent.service
-/run/systemd/units/invocation:zeus-agent.service
-/run/systemd/units/invocation:zeus-monitor.service
-/home/k/.config/systemd/user/timers.target.wants/zeus-agent.timer
-/home/k/.config/systemd/user/default.target.wants/zeus-agent.service
-/home/k/.config/systemd/user/zeus-agent.timer
-/home/k/.config/systemd/user/zeus-agent.service
-  Active FragmentPath: /etc/systemd/system/zeus-agent.service
-  Drop-ins: 
+[0] Testing sudo capability...
+  sudo -n result: sudo: a password is required
+1 
+  sudo -S result: [sudo] password for k: done
 
-[2] Cleaning Zeus completely...
-  Zeus ExecStart now: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/zeus-agent/z
-  Zeus :7777: DOWN
+[1] Killing old Zeus timer + user service...
+  Zeus :7777: OK {"agent": "Zeus", "role": "IT Director", "status": "active",
 
-[3] Mia - force create unit...
-  Mia unit file: ls: cannot access '/etc/systemd/system/mia-agent.service': No such file or direc
-  Mia :9999: DOWN
-  Mia status: Unit mia-agent.service could not be found.
+[2] Mia as user service...
+  Mia :9999: OK {"agent": "Mia", "role": "Receptionist", "status": "active",
+
+[3] Enabling linger...
+  Linger enabled (services survive reboot)
 
 [4] FINAL STATUS...
   Alias :8443: OK
-  Zeus :7777: DOWN
+  Zeus :7777: OK
   Maya :7778: OK
   Ava :7779: OK
   Julian :7780: OK
@@ -42,8 +32,6 @@ FORCE FIX ZEUS + MIA SYSTEMD
   Dina :7786: OK
   Jodi :7790: OK
   Rick :7791: OK
-  Mia :9999: DOWN
+  Mia :9999: OK
 
-  AGENTS: 14/16 | Down: ['Zeus', 'Mia']
-  WhatsApp: running
-  Hierarchy page updated
+  AGENTS: 16/16 | Down: [] | WhatsApp: running
