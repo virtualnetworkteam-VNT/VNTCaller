@@ -1,27 +1,31 @@
 =======================================================
-FINAL FIX - PORTS, MISSING SCRIPTS, LANGGRAPH
+FIX ZEUS + MIA + LANGGRAPH
 =======================================================
 
-[1] Stopping all agent services...
-  All stopped and killed
+[1] Fixing Zeus service path...
+  Unit file location: /etc/systemd/system/zeus-agent.service
+  Old zeus.py: exists, valid - using it
+  Zeus: service=active http=DOWN
+  Zeus error:  Scheduled restart job, restart counter is at 2.
+May 30 09:55:48 ai systemd[1]: Started zeus-agent.service - Zeus VNT IT Agent.
+May 30 09:55:48 ai python3[2080489]: Zeus agent starting on port 7777...
 
-[2] Finding actual service paths...
-  zeus-agent: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/zeus-agent/zeus.py ; i
-  maya-agent: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/maya-agent.py ; ignore
-  mia-agent: 
+[2] Fixing Mia service...
+  Mia unit: 
+  Mia: service=inactive http=DOWN
+  Mia error: 
 
-[3] Writing all agent scripts...
-  Wrote 15/15 agent scripts + fixed service paths
-  Mia agent written (voice set in reception logic)
-
-[4] Fixing LangGraph...
-  LangGraph: FAILED: Traceback (most recent call last):
+[3] Fixing LangGraph import conflict...
+  langgraph location: None
+  Found: /home/k/.local/lib/python3.12/site-packages/langgraph
+  LangGraph (from /tmp): Traceback (most recent call last):
   File "<string>", line 1, in <module>
-AttributeError: module 'la
+Attrib
 
-[5] Starting all services fresh...
+[4] WhatsApp...
+  WhatsApp: 
 
-[6] Testing all ports...
+[5] Final test all agents...
   Alias :8443: OK
   Zeus :7777: DOWN
   Maya :7778: OK
@@ -39,5 +43,4 @@ AttributeError: module 'la
   Rick :7791: OK
   Mia :9999: DOWN
 
-  TOTAL: 14/16 agents responding
-  WhatsApp: 
+  TOTAL: 14/16 agents | WhatsApp: 
