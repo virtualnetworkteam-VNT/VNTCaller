@@ -1,0 +1,30 @@
+=======================================================
+FIX: WEB, PORTAL, MEDIA, SMBD + NEW AGENTS
+=======================================================
+
+[1] Fixing web server :8888...
+  Hierarchy: OK SERVING
+  Media studio page: OK SERVING
+
+[2] Fixing portal :8080...
+  Portal script missing - skipping
+
+[3] Restarting Media API :3333 on M4...
+  M4 SSH: connected
+  Media scripts: 
+  Media API :3333: still down - check /tmp/media.log on M4
+
+[4] Fixing smbd...
+  smbd: inactive
+  smbd error: -- No entries --
+  smbd not installed - installing...
+  smbd after install: active
+
+[5] Creating Argus monitoring agent (:7792)...
+  Argus :7792: OK {"agent": "Argus", "role": "Monitoring", "status": "active",
+  Monitor dashboard: OK at :8888/monitor.html
+
+[6] Final status...
+  Agents: 17/17 (incl Argus)
+  Web/Hierarchy: OK | Portal: down
+  Media M4: down | smbd: active
