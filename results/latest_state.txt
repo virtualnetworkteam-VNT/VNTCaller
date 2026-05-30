@@ -1,54 +1,25 @@
 =======================================================
-DAILY ROUTINE + BACKUP + TOGGLES
+TOGGLE CONTROLS + GUIDE + M4 FIX
 =======================================================
-  Feature flags created: /mnt/vnt-data/FileServer/VNT_World_AI_Division/vnt_features.json
 
-[1] Building backup system...
-  First backup: OK: vnt_backup_2026-05-30_10-39.tar.gz (102KB)
+[1] Adding toggle commands to Alias brain...
+  Toggle function added to brain
+  Alias with toggles: restoring backup
 
-[2] Building restore script...
-  Restore script ready: python3 /home/k/vnt-restore.py
+[2] Restarting M4 media + ensuring persistence...
+  Media API :3333: will retry via LaunchAgent KeepAlive
 
-[3] Building daily routine...
-  Daily routine script ready
+[3] Writing control guide...
+  Guide saved to MemPalace + CONTROL_GUIDE.md
 
-[4] Setting up daily timer (8 AM)...
-  Daily timer (8AM): active
-  Backup timer (2AM): active
+[4] Current feature flags:
+  daily_routine: ON
+  nightly_backup: ON
+  alias_growth: ON
+  auto_self_improve: OFF
+  hourly_health: ON
 
-[5] Test-running daily routine now...
-VNT DAILY ROUTINE REPORT
-========================================
-2026-05-30 10:39
+[5] Testing toggle command...
+  'feature status' -> Our LangGraph feature is currently unavailable due to a module issue. I'm using direct routing as a temporary workaround
 
-[1] CLAUDE ACCESS (relay):
-  Relay last active: 0 min ago OK
-[2] AGENTS:
-  19/19 up | all online
-[3] CHAIN OF COMMAND:
-  Alias->Zeus chain: OK
-[4] VNT DEVICES:
-  M4 Mac (192.168.10.94): online
-  Asusi7 (192.168.10.114): online
-  Prox1 (192.168.10.19): online
-  Prox2 (192.168.10.18): online
-  Nextcloud (192.168.10.10): online
-  Omada (192.168.10.5): online
-[5] SERVICES:
-  Portal: up
-  Web: up
-  Media: down
-  Nextcloud: up
-  smbd: active
-[6] ALIAS GROWTH:
-  Tasks completed: 0
-  Knowledge topics learned: 0
-  Code improvements logged: 0
-[7] BACKUP:
-  OK: vnt_backup_2026-05-30_10-39.tar.gz (104KB)
-
-[6] Backup verification...
-total 116
-drwxr-xr-x  2 k k   4096 May 30 10:39 .
-drwxrwxr-x 17 k k   4096 May 30 10:39 ..
--rw-r--r--  1 k k 106861 May 30 10:39 vnt_backup_2026-05-30_10-39.tar.gz
+  Agents: 19/19
