@@ -1,20 +1,39 @@
 =======================================================
-ALIAS GUARDIAN + RE-ENABLE BACKUP
+SPECTER NETWORK SCAN + DIRECTORY + MEMPALACE RULE
 =======================================================
 
-[1] Re-enabling nightly backup...
-  nightly_backup: ON
+[1] Specter scanning all network devices...
+  Ping-sweeping 192.168.10.0/24...
+  Devices found in ARP:
+  nmap available - detailed scan...
+  Total live devices: 254
+  Authorized: 10 | Unknown/Review: 244
+  Saved: network_device_list.txt
 
-[2] Building Alias Guardian module...
-  Guardian module written
-  Guardian test: alive: True
+VNT NETWORK DEVICE SCAN - 2026-05-30 11:06
+By: Specter (Cybersecurity)
+============================================================
 
-[3] Wiring Guardian into Argus...
-  Argus now guards Alias every 30s
+AUTHORIZED DEVICES:
+  AUTHORIZED  192.168.10.1     e4:fa:c4:55:80:cf  Gateway/Router
+  AUTHORIZED  192.168.10.5     bc:24:11:77:e2:45  Omada Controller
+  AUTHORIZED  192.168.10.10    bc:24:11:38:94:4a  Nextcloud CT104
+  AUTHORIZED  192.168.10.18    1c:69:7a:a2:d9:b6  Proxmox2
+  AUTHORIZED  192.168.10.19    e4:e7:49:4c:46:fe  Proxmox1
+  AUTHORIZED  192.168.10.20    bc:24:11:f8:81:c0  LiveKit CT109
+  AUTHORIZED  192.168.10.21                       TURN CT110
+  AUTH
 
-[4] LIVE GUARDIAN TEST - killing Alias to test auto-recovery...
-  Alias killed. Waiting 45s for Argus guardian to recover...
-  Alias after guardian: RECOVERED ✓
+[2] Organizing directory structure...
+  Created 25 organized folders
+  Directory rule saved: 00_DIRECTORY_RULE.md
+
+[3] Establishing MemPalace-first rule...
+  MemPalace-first rule saved
+  MemPalace: 289K, 9652 lines
+
+[4] Taking fresh backup...
+  OK: vnt_backup_2026-05-30_11-06.tar.gz (107KB)
 
 [5] Final status...
   Agents: 19/19
