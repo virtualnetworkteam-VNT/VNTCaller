@@ -1,82 +1,30 @@
 =======================================================
-FULL SYSTEM DIAGNOSTIC - 2026-05-30 10:15
+FIX: WEB, PORTAL, MEDIA, SMBD + NEW AGENTS
 =======================================================
 
-[1] All 16 agents...
-  Alias :8443: OK
-  Zeus :7777: OK
-  Maya :7778: OK
-  Ava :7779: OK
-  Julian :7780: OK
-  Ethan :7781: OK
-  Lee :7782: OK
-  Amr :7783: OK
-  Nova :7784: OK
-  Specter :7788: OK
-  Luc :7787: OK
-  Ben :7789: OK
-  Dina :7786: OK
-  Jodi :7790: OK
-  Rick :7791: OK
-  Mia :9999: OK
-  AGENTS: 16/16 | Down: []
+[1] Fixing web server :8888...
+  Hierarchy: OK SERVING
+  Media studio page: OK SERVING
 
-[2] User service status...
-  zeus-agent: active
-  mia-agent: active
-  maya-agent: inactive
-  specter-agent: inactive
+[2] Fixing portal :8080...
+  Portal script missing - skipping
 
-[3] Specter cybersecurity activity...
-  Specter status: {"agent": "Specter", "role": "CyberSec", "status": "active", "port": 7788}
-  Specter MemPalace entries: 9
+[3] Restarting Media API :3333 on M4...
+  M4 SSH: connected
+  Media scripts: 
+  Media API :3333: still down - check /tmp/media.log on M4
 
-[4] Web server :8888...
-  vnt-webserver user: inactive | system: activating
-  Port 8888 listening: NOTHING
-  Hierarchy page: NOT SERVING
-  Media studio page: NOT SERVING
-  Hierarchy file: -rw-rw-r-- 1 k k 13417 May 30 10:11 /home/k/vnt-web/vnt_hierarchy.html
-
-[5] Media Studio API :3333 (M4)...
-  M4 ping: 1 received
-  Media API :3333: NOT RESPONDING
-
-[6] Portal :8080...
-  Portal: DOWN
-
-[7] smbd file sharing...
+[4] Fixing smbd...
   smbd: inactive
+  smbd error: -- No entries --
+  smbd not installed - installing...
+  smbd after install: active
 
-[8] Prox1 file server (deep check)...
-  Prox1 SSH: OK
-proxmox
-  Containers:
-VMID       Status     Lock         Name                
-102        stopped                 uptimekuma          
-103        stopped                 netalertx           
-104        running                 NextCloud           
-105        running                 Cloudflare-Gateway  
-106        stopped  
-  Storage:
-Name             Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
-local             dir     active        98497780        18353116        75095116   18.63%
-local-lvm     lvmthin     active       365760512        30102090       335658421    8.23%
-  CT104 (Nextcloud): status: running
+[5] Creating Argus monitoring agent (:7792)...
+  Argus :7792: OK {"agent": "Argus", "role": "Monitoring", "status": "active",
+  Monitor dashboard: OK at :8888/monitor.html
 
-[9] Nextcloud 192.168.10.10...
-  Nextcloud HTTP: 302
-
-[10] WhatsApp + voice...
-  WhatsApp: running | Voice: MichelleNeural
-
-[11] Relay...
-  Last log:
-2026-05-30 10:06:37,266 Completed: stable.py
-2026-05-30 10:15:32,716 Executing: fulldiag.py
-
-=======================================================
-SUMMARY: 16/16 agents | Down: []
-Web:activating Media:down Portal:down
-smbd:inactive Nextcloud:302 WhatsApp:OK
-=======================================================
+[6] Final status...
+  Agents: 17/17 (incl Argus)
+  Web/Hierarchy: OK | Portal: down
+  Media M4: down | smbd: active
