@@ -1,1 +1,1 @@
-{"ts": "20260530_1950", "results": {"msi_api": "FAIL 0", "vntworld": "PASS 107366b", "m4_api": "FAIL 0", "nextcloud": "PASS 33702b"}}
+{"ts": "20260530_1952", "results": {"portal_log": "nohup: ignoring input\n[19:50:51] VNT Portal :8888 -> http://192.168.10.94:3333\n", "portal_syntax": "OK", "msi_8888": "FAIL 0", "msi_api": "FAIL 0", "m4_health": "{\"status\": \"online\", \"api\": \"VNT Studio v3.2\", \"comfyui\": \"o"}}
