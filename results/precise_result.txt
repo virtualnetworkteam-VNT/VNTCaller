@@ -1,0 +1,43 @@
+=======================================================
+PRECISE FIX: ZEUS CRASH, MIA UNIT, LANGGRAPH FOLDER
+=======================================================
+
+[1] Zeus - capturing exact crash...
+  Old zeus.py crash:
+Zeus agent starting on port 7777...
+  Zeus now: still DOWN
+
+[2] Mia - forcing service registration...
+  mia-agent.py: valid
+  Mia now: still DOWN
+  Mia error: 
+
+[3] LangGraph - removing corrupt folder...
+  Install: Installing collected packages: langgraph
+Successfully installed langgraph-1.2.2
+  LangGraph: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+Attrib
+
+[4] WhatsApp...
+  WhatsApp: 
+
+[5] Final test...
+  Alias :8443: OK
+  Zeus :7777: DOWN
+  Maya :7778: OK
+  Ava :7779: OK
+  Julian :7780: OK
+  Ethan :7781: OK
+  Lee :7782: OK
+  Amr :7783: OK
+  Nova :7784: OK
+  Specter :7788: OK
+  Luc :7787: OK
+  Ben :7789: OK
+  Dina :7786: OK
+  Jodi :7790: OK
+  Rick :7791: OK
+  Mia :9999: DOWN
+
+  TOTAL: 14/16 | Down: ['Zeus', 'Mia'] | WhatsApp:  | LangGraph: Traceback (most rece
