@@ -1,0 +1,25 @@
+=======================================================
+TOGGLE CONTROLS + GUIDE + M4 FIX
+=======================================================
+
+[1] Adding toggle commands to Alias brain...
+  Toggle function added to brain
+  Alias with toggles: restoring backup
+
+[2] Restarting M4 media + ensuring persistence...
+  Media API :3333: will retry via LaunchAgent KeepAlive
+
+[3] Writing control guide...
+  Guide saved to MemPalace + CONTROL_GUIDE.md
+
+[4] Current feature flags:
+  daily_routine: ON
+  nightly_backup: ON
+  alias_growth: ON
+  auto_self_improve: OFF
+  hourly_health: ON
+
+[5] Testing toggle command...
+  'feature status' -> Our LangGraph feature is currently unavailable due to a module issue. I'm using direct routing as a temporary workaround
+
+  Agents: 19/19
