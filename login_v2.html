@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VNT World - Secure Login</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0f1e;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e8f0f8}
+.brand{font-size:14px;font-weight:700;letter-spacing:4px;color:#818cf8;position:fixed;top:20px;left:24px}
+.exit-btn{position:fixed;top:16px;right:20px;padding:8px 16px;border:1px solid #1e2a38;background:none;color:#4a6080;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:2px}
+.exit-btn:hover{color:#e8f0f8;border-color:#818cf8}
+.card{background:#0d1117;border:1px solid #1e2a38;border-radius:16px;padding:40px;width:100%;max-width:440px;margin:0 16px}
+.logo{font-size:48px;font-weight:900;letter-spacing:4px;color:#818cf8;text-align:center;margin-bottom:8px}
+.tagline{font-size:14px;color:#6366f1;text-align:center;margin-bottom:4px;font-weight:600}
+.sub{font-size:12px;color:#4a6080;text-align:center;margin-bottom:28px}
+.warn{background:#1e1a10;border:1px solid #4a3800;border-radius:8px;padding:12px 14px;margin-bottom:24px;font-size:12px;color:#d4a60a;display:flex;gap:8px;align-items:flex-start}
+label{font-size:11px;color:#4a6080;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px}
+input{width:100%;background:#111820;border:1px solid #1e2a38;border-radius:8px;padding:12px 14px;color:#e8f0f8;font-size:14px;margin-bottom:16px;outline:none;transition:border-color .2s}
+input:focus{border-color:#6366f1}
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:44px}
+.eye-btn{position:absolute;right:12px;top:12px;background:none;border:none;color:#4a6080;cursor:pointer;font-size:16px}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,#4f46e5,#6366f1);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:opacity .2s;margin-top:4px}
+.login-btn:hover{opacity:.9}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.msg{font-size:12px;text-align:center;margin-top:12px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="brand">VNT // WORLD</div>
+<button class="exit-btn" onclick="window.location.href='/'">&#9667; EXIT</button>
+<div class="card">
+  <div class="logo">VNT</div>
+  <div class="tagline">Virtual Network Team</div>
+  <div class="sub">Secure Member Portal</div>
+  <div class="warn">&#9888; <span><strong>AUTHORIZED ACCESS ONLY.</strong> Private corporate network. All activity is monitored.</span></div>
+  <label for="loginId">EMAIL / USER ID</label>
+  <input type="text" id="loginId" placeholder="Enter your username or email" autocomplete="username">
+  <label for="loginPwd">PASSWORD</label>
+  <div class="pass-wrap">
+    <input type="password" id="loginPwd" placeholder="Enter your password" autocomplete="current-password">
+    <button class="eye-btn" onclick="togglePwd()" id="eyeBtn">&#128065;</button>
+  </div>
+  <button class="login-btn" id="loginBtn" onclick="doLogin()">LOG IN</button>
+  <div class="msg" id="loginMsg"></div>
+</div>
+<script>
+var USERS = {
+  'ryan':       {pass:'USER_PASS',            name:'Ryan Khawaja',role:'admin'},
+  'khawaja':    {pass:'USER_PASS2', name:'Ryan',         role:'admin'},
+  'administrator':{pass:'0568USER_PASS',      name:'Admin',        role:'admin'},
+  'kraheelw':   {pass:'USER_PASS',            name:'Ryan Khawaja', role:'admin'},
+  'kraheelw@vntworld.com':{pass:'USER_PASS',  name:'Ryan Khawaja', role:'admin'}
+};
+
+function togglePwd(){
+  var i=document.getElementById('loginPwd');
+  i.type=i.type==='password'?'text':'password';
+}
+
+function doLogin(){
+  var id=(document.getElementById('loginId').value||'').trim().toLowerCase();
+  var pwd=document.getElementById('loginPwd').value;
+  var msg=document.getElementById('loginMsg');
+  var btn=document.getElementById('loginBtn');
+  if(!id||!pwd){msg.style.color='#ff8c00';msg.textContent='Please enter your credentials.';return;}
+  btn.disabled=true;btn.textContent='Authenticating...';
+  msg.textContent='';
+  // Local auth - no server needed
+  var u=USERS[id];
+  if(u&&u.pass===pwd){
+    var token='vnt-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+    var userObj={id:id,name:u.name,role:u.role};
+    sessionStorage.setItem('vnt_user',JSON.stringify(userObj));
+    localStorage.setItem('vnt_user',JSON.stringify(userObj));
+    localStorage.setItem('vnt_token',token);
+    msg.style.color='#00e676';msg.textContent='Access granted. Loading...';
+    setTimeout(function(){window.location.href='/dashboard.html';},400);
+  } else {
+    msg.style.color='#ff3b5c';msg.textContent='Invalid credentials. Access denied.';
+    btn.disabled=false;btn.textContent='LOG IN';
+  }
+}
+
+document.getElementById('loginPwd').addEventListener('keydown',function(e){
+  if(e.key==='Enter') doLogin();
+});
+
+// Auto-check if already logged in
+var existing=sessionStorage.getItem('vnt_user')||localStorage.getItem('vnt_user');
+if(existing){
+  try{
+    var eu=JSON.parse(existing);
+    if(eu&&eu.id) window.location.href='/dashboard.html';
+  }catch(e){}
+}
+</script>
+</body>
+</html>
