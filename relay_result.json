@@ -1,0 +1,11 @@
+{
+  "ts": "20260530_1626",
+  "results": {
+    "ct108_web": "200 12406b",
+    "dash_size": "12406 /var/www/html/dashboard.html",
+    "web_process": "root       23107  0.0  0.0   7092  1964 ?        S    16:18   0:00 bash -c cd /v",
+    "m4_api": "{\"status\": \"online\", \"api\": \"VNT Studio v3.2\", \"comfyui\": \"ok\", \"python\": \"/User",
+    "msi_proxy": "0 <urlopen error timed out>b",
+    "vntworld": "200 13829b"
+  }
+}
