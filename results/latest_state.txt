@@ -1,23 +1,20 @@
 =======================================================
-M4 MEDIA API + RCA GUIDE
+VERIFY ALIAS + RETRY BRAIN WIRING (clean)
 =======================================================
 
-[1] Building M4 media API server...
-  Image script: /Users/alias/ai-media/generate.py
-  Video script: /Users/alias/ai-video/generate_video.py
-  3D script: /Users/alias/ai-3d/generate_3d.py
-  Media API :3333: OK {"service": "VNT Media API", "status": "active", "port": 3333, "capabilities": [
-  Media API set to auto-start on M4 (LaunchAgent)
+[1] Alias status...
+  Alias :8443: {"agent": "Alias", "role": "CEO", "status": "active", "model": "llama-3.3-70b-versatile", 
+  Brain module wired: True
 
-[2] Saving complete RCA guide to MemPalace...
-  Full RCA guide saved to MemPalace
+[2] Brain module check...
+  Brain module: exists, valid syntax
+  Model picker: groq
+  Web search: returns empty (may need different search)
+  RAG chars: 1102
 
-[3] Final verification...
-  Agents: 17/17
-  Web/Hierarchy: OK | Monitor: OK
-  Portal: OK | Media M4: OK | smbd: active
+[3] Brain already wired - testing...
 
-=======================================================
-COMPLETE: 17/17 agents | Web OK | Portal OK | Monitor OK
-Media: OK | smbd: active
-=======================================================
+[4] Smart query test...
+  Alias: VNT operations are currently experiencing a disruption due to an Alias crash, caused by an address already in use error. I'm working to resolve the issue and re
+
+  Agents: 17/17 | Brain wired: True
