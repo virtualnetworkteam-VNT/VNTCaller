@@ -1,15 +1,16 @@
 {
-  "ts": "20260530_1633",
+  "ts": "20260530_1638",
   "results": {
-    "msi_proxy": "PASS 37885b",
-    "dashboard": "PASS 79701b",
-    "app": "PASS 26396b",
-    "api_proxy": "FAIL 0 timed out",
-    "vnt_dashboard.html": "PASS 81124b",
-    "vnt_app.html": "PASS 27819b",
-    "audio": "FAIL timed out",
-    "image": "FAIL timed out",
-    "nextcloud": "PASS",
-    "m4_direct": "PASS"
+    "msi_8888": "PASS 37885b",
+    "api_proxy": "PASS",
+    "ct108_dash": "PASS 37885b",
+    "ct108_app": "PASS 26396b",
+    "vntworld.com": "PASS 39308b",
+    "vnt_app": "PASS 27819b",
+    "MSI_portal": "PASS 37885b",
+    "MSI_api": "PASS 164b",
+    "nextcloud": "PASS 33702b",
+    "ct108_internal": "PASS 12946b",
+    "m4_api": "PASS"
   }
 }
