@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VNT Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#f8fafc;font-family:"Courier New",monospace;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{z-index:100;background:#1e1b4b;border-bottom:1px solid #312e81;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-size:12px;letter-spacing:4px;color:#818cf8;font-weight:700}
+.user-chip{display:flex;align-items:center;gap:10px;font-size:12px}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.logout-btn{background:transparent;border:1px solid #4f46e5;color:#818cf8;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px}
+.logout-btn:hover{background:#4f46e5;color:#fff}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:190px;background:#0d1117;border-right:1px solid #1e2a38;padding:10px 0;flex-shrink:0;display:flex;flex-direction:column}
+.si{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:11px;letter-spacing:2px;color:#4a6080;border-left:3px solid transparent;transition:all 0.2s}
+.si:hover{color:#e8f0f8;background:rgba(99,102,241,0.08)}
+.si.active{color:#818cf8;background:rgba(99,102,241,0.12);border-left-color:#6366f1}
+.si.off{opacity:0.2;cursor:not-allowed;pointer-events:none}
+.content{flex:1;overflow:hidden;position:relative}
+.pane{position:absolute;inset:0;overflow-y:auto;padding:24px;display:none}
+.pane.active{display:block}
+.fpane{position:absolute;inset:0;display:none}
+.fpane.active{display:block}
+.fpane iframe{width:100%;height:100%;border:none}
+.wcard{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));border:1px solid rgba(99,102,241,0.3);border-radius:12px;padding:24px;margin-bottom:20px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.scard{background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:16px}
+.sl{font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:6px}
+.sv{font-size:18px;font-weight:700}
+.ugrid{display:grid;gap:10px}
+.ucard{background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(99,102,241,0.15);color:#818cf8}
+.inp{width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:10px;border-radius:6px;font-size:13px;font-family:"Courier New",monospace;margin-bottom:10px}
+.btn-p{background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:#fff;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:12px}
+.btn-s{background:#1e2a38;border:none;color:#94a3b8;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:12px}
+</style>
+
+<style>
+/* ── Font & Mobile Overrides ── */
+:root { font-size: 14px; }
+body { font-size: 14px; line-height: 1.5; }
+.topbar .logo { font-size: 14px !important; letter-spacing: 3px !important; }
+.sidebar .si-label { font-size: 12px !important; }
+.sidebar .si-label span { font-size: 12px !important; }
+#content h2, .pane-title { font-size: 16px !important; font-weight: 700 !important; }
+.card-title, .section-label { font-size: 10px !important; letter-spacing: 2px !important; }
+.agent-name { font-size: 14px !important; font-weight: 600 !important; }
+.agent-role { font-size: 12px !important; }
+table td, table th { font-size: 13px !important; }
+.btn { font-size: 13px !important; }
+.tag-badge, .status-badge { font-size: 10px !important; }
+/* Mobile */
+@media (max-width: 768px) {
+  body { font-size: 15px !important; }
+  .sidebar { width: 240px !important; }
+  .si-label { font-size: 14px !important; }
+  table td, table th { font-size: 14px !important; }
+  .agent-name { font-size: 15px !important; }
+  #content { padding: 16px !important; }
+  .infra-grid { grid-template-columns: 1fr !important; }
+  .card { padding: 16px !important; }
+}
+/* Fix tab/navigation overlap */
+.pane { padding-top: 16px !important; overflow-x: hidden !important; }
+.sidebar { z-index: 100 !important; }
+#topbar { z-index: 200 !important; }
+.content-area { z-index: 1 !important; }
+/* Agent status dot sizes */
+.agent-dot { width: 10px !important; height: 10px !important; }
+</style>
+
+
+<style>
+/* ── VNT v6 Global Fixes ── */
+body { font-family: 'Segoe UI', 'Inter', 'SF Pro Display', system-ui, sans-serif; }
+
+/* Sidebar text larger */
+.si-label, .sidebar a, .sidebar div { font-size: 13px !important; }
+.sl { font-size: 12px !important; letter-spacing: 1.5px !important; }
+.sv { font-size: 18px !important; font-weight: 700 !important; }
+
+/* Content readability */
+.fpane, #content { font-size: 14px !important; line-height: 1.6 !important; }
+.fpane table td { font-size: 13px !important; padding: 10px 14px !important; }
+.fpane table th { font-size: 11px !important; letter-spacing: 1.5px !important; padding: 8px 14px !important; }
+
+/* Tab/navigation overlap fix */
+#sidebar { position: relative; z-index: 50; flex-shrink: 0; }
+.topbar { position: relative; z-index: 100; }
+#main { overflow: hidden; }
+.fpane { 
+  overflow-y: auto !important; 
+  overflow-x: hidden !important;
+  padding: 24px !important; 
+}
+
+/* Status dot */
+.status-dot { width: 10px !important; height: 10px !important; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  body { font-size: 15px !important; }
+  .si-label { font-size: 14px !important; }
+  .sl { font-size: 13px !important; }
+  .sv { font-size: 20px !important; }
+  .fpane { padding: 16px !important; }
+  .fpane table td { font-size: 14px !important; }
+  #sidebar { width: 220px !important; }
+}
+@media (max-width: 600px) {
+  #sidebar { display: none; }
+  .fpane { padding: 12px !important; }
+  .sgrid { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* Status colors */
+.status-active  { color: #00e676 !important; }
+.status-working { color: #2979ff !important; }
+.status-standby { color: #ff8c00 !important; }
+.status-offline { color: #ff3b5c !important; }
+
+/* Connecting dot pulse */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.conn-dot { animation: blink 2s infinite; }
+</style>
+
+
+<style id="pane-fix">
+.layout{display:flex!important;flex-direction:row!important;height:calc(100vh - 52px)!important;overflow:hidden!important}
+#sidebar,.sidebar{width:185px!important;min-width:185px!important;flex-shrink:0!important;position:relative!important;z-index:10!important;overflow-y:auto!important;overflow-x:hidden!important}
+.content{flex:1!important;position:relative!important;overflow:hidden!important;min-width:0!important}
+.pane{position:absolute!important;inset:0!important;display:none!important;overflow-y:auto!important;overflow-x:hidden!important;padding:24px!important;box-sizing:border-box!important}
+.pane.active{display:block!important}
+.fpane{position:absolute!important;inset:0!important;display:none!important;overflow-y:auto!important;overflow-x:hidden!important;padding:24px!important;box-sizing:border-box!important}
+.fpane.active{display:block!important}
+body,html{font-size:14px!important;font-family:'Segoe UI',system-ui,sans-serif!important}
+@media(max-width:600px){#sidebar,.sidebar{display:none!important}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">VNT // PORTAL</div>
+  <div id="live-clock" style="font-size:11px;color:#818cf8;font-family:Courier New,monospace;letter-spacing:2px;margin-right:8px;text-align:right"></div>
+  <div class="user-chip">
+    <div class="avatar" id="uAvatar">A</div>
+    <span id="uName">-</span>
+    <span style="color:#4a6080;font-size:10px" id="uRole"></span>
+    <button class="logout-btn" onclick="logout()">&#9679; LOGOUT</button>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    <div class="si active" onclick="go('home')" id="s-home">&#8862; OVERVIEW</div>
+    <div class="si" onclick="go('hier')" id="s-hier">&#9670; HIERARCHY</div>
+    <div class="si" onclick="go('webui')" id="s-webui">&#9711; WEB UI</div>
+    <div class="si" onclick="go('games')" id="s-games">&#9733; GAMES</div>
+    <div class="si" onclick="go('apps')" id="s-apps">&#9633; APPS</div>
+    <div class="si" onclick="go('studio')" id="s-studio">&#9680; MEDIA STUDIO</div>
+    <div class="si" onclick="go('desk1')" id="s-desk1">&#128188; DESKTOP 1</div>
+    <div class="si" onclick="go('desk2')" id="s-desk2">&#128192; DESKTOP 2</div>
+    <div class="si" onclick="go('users')" id="s-users" style="margin-top:auto">&#128101; USERS</div>
+    <div class="si" onclick="go('profile')" id="s-profile">&#9881; MY PROFILE</div>
+  </div>
+  <div class="content">
+    <div class="pane active" id="p-home">
+      <!-- Header -->
+      <div style="font-size:22px;font-weight:700;color:#e8f0f8;margin-bottom:4px;letter-spacing:0.5px">Command Center</div>
+      <div style="font-size:13px;color:#4a6080;margin-bottom:20px">VNT World AI Division &middot; <span id="wName" style="color:#818cf8">-</span></div>
+      
+      <!-- Status Cards -->
+      <div class="sgrid" style="margin-bottom:24px">
+        <div class="scard"><div class="sl">AI SERVER</div><div class="sv" style="color:#00e676" id="st-ai">CHECKING</div><div style="font-size:11px;color:#4a6080;margin-top:4px">192.168.10.96</div></div>
+        <div class="scard"><div class="sl">M4 MEDIA NODE</div><div class="sv" id="st-m4" style="color:#00e676">CHECKING</div><div style="font-size:11px;color:#4a6080;margin-top:4px">192.168.10.94</div></div>
+        <div class="scard"><div class="sl">ALIAS CEO</div><div class="sv" style="color:#00e676">ACTIVE</div><div style="font-size:11px;color:#4a6080;margin-top:4px">WhatsApp + Voice</div></div>
+        <div class="scard"><div class="sl">ZEUS IT DIR.</div><div class="sv" style="color:#ff8c00">STANDBY</div><div style="font-size:11px;color:#4a6080;margin-top:4px">IT / CyberSec</div></div>
+        <div class="scard"><div class="sl">MEDIA STUDIO</div><div class="sv" id="st-studio" style="color:#00e676">CHECKING</div><div style="font-size:11px;color:#4a6080;margin-top:4px">:3333</div></div>
+        <div class="scard"><div class="sl">NEXTCLOUD</div><div class="sv" id="st-nc" style="color:#00e676">CHECKING</div><div style="font-size:11px;color:#4a6080;margin-top:4px">192.168.10.10</div></div>
+        <div class="scard"><div class="sl">WEB SERVER</div><div class="sv" style="color:#00e676">ONLINE</div><div style="font-size:11px;color:#4a6080;margin-top:4px">CT108 :80</div></div>
+        <div class="scard"><div class="sl">AGENTS ONLINE</div><div class="sv" id="st-agents" style="color:#818cf8">14/16</div><div style="font-size:11px;color:#4a6080;margin-top:4px">All divisions</div></div>
+      </div>
+      
+      <!-- Infrastructure: Prox1 + Prox2 + All Nodes -->
+      <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:12px;border-left:2px solid #818cf8;padding-left:8px">INFRASTRUCTURE</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px">
+        
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px">
+          <div style="font-size:13px;font-weight:700;color:#e8f0f8;margin-bottom:6px">&#9642; Proxmox 1 &nbsp;<span style="font-size:10px;color:#4a6080;font-weight:400">192.168.10.19</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:11px">
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">CT104 &nbsp;<span style="color:#4a6080">Nextcloud</span></span>
+              <span style="color:#00e676">&#9679; 192.168.10.10</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">CT108 &nbsp;<span style="color:#4a6080">Web Server</span></span>
+              <span style="color:#00e676">&#9679; 192.168.10.13</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">CT110 &nbsp;<span style="color:#4a6080">coturn / TURN</span></span>
+              <span style="color:#00e676">&#9679; :3478</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">CT101 &nbsp;<span style="color:#4a6080">Backup Omada</span></span>
+              <span style="color:#ff3b5c">&#9679; STOPPED</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px">
+          <div style="font-size:13px;font-weight:700;color:#e8f0f8;margin-bottom:6px">&#9642; Proxmox 2 &nbsp;<span style="font-size:10px;color:#4a6080;font-weight:400">192.168.10.18</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:11px">
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">VM100 &nbsp;<span style="color:#4a6080">Omada Controller</span></span>
+              <span style="color:#00e676">&#9679; 192.168.10.5</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">CT101 &nbsp;<span style="color:#4a6080">Standby</span></span>
+              <span style="color:#ff8c00">&#9679; STANDBY</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px">
+          <div style="font-size:13px;font-weight:700;color:#e8f0f8;margin-bottom:6px">&#9632; AI Server &nbsp;<span style="font-size:10px;color:#4a6080;font-weight:400">192.168.10.96</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:11px">
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">Ollama &nbsp;<span style="color:#4a6080">llama3.1:8b</span></span>
+              <span style="color:#00e676">&#9679; :11434</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">n8n &nbsp;<span style="color:#4a6080">Automation</span></span>
+              <span style="color:#00e676">&#9679; :5678</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">OpenClaw &nbsp;<span style="color:#4a6080">Gateway</span></span>
+              <span style="color:#00e676">&#9679; :18789</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">Vaultwarden &nbsp;<span style="color:#4a6080">Passwords</span></span>
+              <span style="color:#00e676">&#9679; :8181</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px">
+          <div style="font-size:13px;font-weight:700;color:#e8f0f8;margin-bottom:6px">&#127909; M4 MacBook Pro &nbsp;<span style="font-size:10px;color:#4a6080;font-weight:400">192.168.10.94</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:11px">
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">Media Studio API</span>
+              <span style="color:#00e676">&#9679; :3333</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">ComfyUI</span>
+              <span style="color:#00e676">&#9679; :7861</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">FLUX.1 / SD 1.5</span>
+              <span style="color:#818cf8">&#9679; READY</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">TripoSR &nbsp;<span style="color:#4a6080">3D Mesh</span></span>
+              <span style="color:#818cf8">&#9679; READY</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px">
+          <div style="font-size:13px;font-weight:700;color:#e8f0f8;margin-bottom:6px">&#9825; Network &nbsp;<span style="font-size:10px;color:#4a6080;font-weight:400">Omada SDN</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:11px">
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">Public IP</span>
+              <span style="color:#00e676">&#9679; 94.49.29.97</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">vntworld.com</span>
+              <span style="color:#00e676">&#9679; CLOUDFLARE CDN</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">Omada Controller</span>
+              <span style="color:#00e676">&#9679; :8043</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#060d14;border-radius:4px">
+              <span style="color:#e8f0f8">TURN Server (coturn)</span>
+              <span style="color:#00e676">&#9679; :3478</span>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Agent Status Summary - organizational view -->
+      <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:12px;border-left:2px solid #00e676;padding-left:8px">AGENT STATUS</div>
+      <div id="agent-status-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+    <div class="fpane" id="p-hier">
+<div style="font-size:20px;font-weight:700;color:#e8f0f8;margin-bottom:4px">Organizational Hierarchy</div>
+<div style="font-size:13px;color:#4a6080;margin-bottom:24px">VNT World AI Division &mdash; Management Structure</div>
+
+<style>
+.org-tree{display:flex;flex-direction:column;align-items:center;width:100%}
+.org-level{display:flex;justify-content:center;gap:12px;position:relative;width:100%}
+.org-node{
+  background:#0d1117;border:1px solid #2e3a4e;border-radius:10px;
+  padding:12px 16px;text-align:center;min-width:130px;max-width:160px;
+  position:relative;cursor:default;transition:border-color .2s;
+}
+.org-node:hover{border-color:#818cf8;}
+.org-node .nd-name{font-size:14px;font-weight:700;color:#e8f0f8;white-space:nowrap;}
+.org-node .nd-role{font-size:10px;color:#4a6080;margin-top:3px;line-height:1.3}
+.org-node .nd-st{font-size:9px;margin-top:6px;padding:2px 8px;border-radius:10px;display:inline-block}
+.org-connector{display:flex;justify-content:center;position:relative}
+.org-connector::before{content:'';position:absolute;top:0;left:50%;width:2px;height:100%;background:#1e2a38}
+.org-horiz{
+  height:2px;background:#1e2a38;
+  position:absolute;top:0;
+}
+.org-branch{display:flex;flex-direction:column;align-items:center}
+.org-vline{width:2px;height:24px;background:#1e2a38;margin:0 auto}
+.org-hrow{display:flex;align-items:flex-start;justify-content:center;position:relative;width:100%}
+/* horizontal bar spanning all children */
+.org-hbar{height:2px;background:#1e2a38;position:absolute;top:0;left:50%;right:0;transform:translateX(-50%)}
+</style>
+
+<!-- CEO row -->
+<div class="org-tree">
+
+  <!-- RYAN at top -->
+  <div class="org-node" style="border-color:#6366f1;background:linear-gradient(135deg,rgba(99,102,241,.15),#0d1117);min-width:180px">
+    <div class="nd-name">Ryan Khawaja</div>
+    <div class="nd-role">Chairman &amp; Owner</div>
+    <div class="nd-st" style="background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.4);color:#818cf8">&#9679; Founder</div>
+  </div>
+  <div class="org-vline"></div>
+
+  <!-- Alias CEO -->
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <div class="org-node" style="border-color:#818cf8;background:linear-gradient(135deg,rgba(129,140,248,.12),#0d1117);min-width:180px">
+      <div class="nd-name">Alias &nbsp;<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(37,99,235,.2);color:#60a5fa">WA</span></div>
+      <div class="nd-role">Chief Executive Officer</div>
+      <div class="nd-st" style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:#00e676">&#9679; Active</div>
+    </div>
+    <div class="org-vline" style="height:32px"></div>
+  </div>
+
+  <!-- Horizontal bar to direct reports -->
+  <div style="position:relative;width:90%;max-width:1100px;margin:0 auto">
+    <div style="height:2px;background:#1e2a38;width:100%"></div>
+    <!-- Vertical drops for each department head -->
+    <div style="display:flex;justify-content:space-around;width:100%">
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+      <div style="height:24px;width:2px;background:#1e2a38"></div>
+    </div>
+  </div>
+
+  <!-- Direct reports row -->
+  <div style="display:flex;justify-content:space-around;gap:8px;width:90%;max-width:1100px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Zeus</div>
+        <div class="nd-role">IT Director</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #ff8c0044;color:#ff8c00">&#9679; Standby</div>
+      </div>
+      <div style="width:2px;height:20px;background:#1e2a38;margin:0 auto"></div>
+      <div style="display:flex;gap:8px;">
+        <div class="org-node" style="min-width:100px;border-color:#1e2a38">
+          <div class="nd-name" style="font-size:12px">Luc</div>
+          <div class="nd-role">Developer</div>
+          <div class="nd-st" style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:#00e676">&#9679; Active</div>
+        </div>
+        <div class="org-node" style="min-width:100px;border-color:#1e2a38">
+          <div class="nd-name" style="font-size:12px">Ben</div>
+          <div class="nd-role">IT Ops</div>
+          <div class="nd-st" style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:#00e676">&#9679; Active</div>
+        </div></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Maya</div>
+        <div class="nd-role">Finance &amp; Crypto</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Ava</div>
+        <div class="nd-role">Files &amp; Docs</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Julian</div>
+        <div class="nd-role">Project Manager</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Dr. Ethan</div>
+        <div class="nd-role">Chief Medical</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div>
+      <div style="width:2px;height:20px;background:#1e2a38;margin:0 auto"></div>
+      <div style="display:flex;gap:8px;">
+        <div class="org-node" style="min-width:100px;border-color:#1e2a38">
+          <div class="nd-name" style="font-size:12px">Dina</div>
+          <div class="nd-role">Nurse</div>
+          <div class="nd-st" style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:#00e676">&#9679; Active</div>
+        </div></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Specter</div>
+        <div class="nd-role">Cybersecurity</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Amr</div>
+        <div class="nd-role">Legal Advisor</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Nova</div>
+        <div class="nd-role">Civil Architect</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Mia</div>
+        <div class="nd-role">Receptionist</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Lee</div>
+        <div class="nd-role">Marketing</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Jodi</div>
+        <div class="nd-role">Research</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="org-node">
+        <div class="nd-name">Rick</div>
+        <div class="nd-role">Tech Research</div>
+        <div class="nd-st" style="background:rgba(0,0,0,.2);border:1px solid #00e67644;color:#00e676">&#9679; Active</div>
+      </div></div>
+  </div>
+</div>
+</div>
+<div class="fpane" id="p-webui"><iframe id="f-webui" src=""></iframe></div>
+    <div class="fpane" id="p-studio">
+<div style="display:flex;flex-direction:column;height:100%;background:#0f172a">
+  <!-- Studio top bar - minimal -->
+  <div style="background:#1e1b4b;border-bottom:1px solid #312e81;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <span style="font-size:11px;letter-spacing:3px;color:#818cf8;font-weight:700">VNT // MEDIA STUDIO</span>
+    <div style="display:flex;gap:14px;font-size:10px;align-items:center">
+      <span><span id="stu-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff8c00;margin-right:4px;vertical-align:middle"></span><span id="stu-txt" style="color:#ff8c00">Connecting...</span></span>
+      <span><span id="comfy-dot2" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:4px;vertical-align:middle"></span>ComfyUI</span>
+      <a href="http://192.168.10.94:7861" target="_blank" style="color:#4a6080;font-size:10px;text-decoration:none">M4 Node &#8599;</a>
+    </div>
+  </div>
+  <!-- Generation tabs -->
+  <div style="display:flex;border-bottom:1px solid #1e2a38;background:#0d1117;flex-shrink:0;overflow-x:auto">
+    <button onclick="stuTab('images',this)" id="stab-images" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid #6366f1;color:#818cf8;cursor:pointer;font-family:monospace;white-space:nowrap">&#9670; IMAGES</button>
+    <button onclick="stuTab('videos',this)" id="stab-videos" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9654; VIDEOS</button>
+    <button onclick="stuTab('3ds',this)" id="stab-3ds" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9679; 3D MODELS</button>
+    <button onclick="stuTab('audios',this)" id="stab-audios" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9836; AUDIO</button>
+    <button onclick="stuTab('2ds',this)" id="stab-2ds" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9633; 2D DRAWINGS</button>
+    <button onclick="stuTab('coding',this)" id="stab-coding" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9001; CODING</button>
+    <button onclick="stuTab('dev',this)" id="stab-dev" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9964; DEVELOPMENT</button>
+  </div>
+  <!-- Generation panels -->
+  <div style="flex:1;overflow-y:auto;padding:20px">
+
+    <!-- IMAGES -->
+    <div id="spane-images" style="display:block">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #6366f1;padding-left:8px">IMAGE GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;letter-spacing:1px;text-transform:uppercase">Prompt</div>
+          <textarea id="s-ip" rows="3" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">professional portrait, cinematic lighting, Sony A7R4...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;letter-spacing:1px;text-transform:uppercase">Negative Prompt</div>
+          <textarea id="s-in" rows="2" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">blurry, watermark, low quality...</textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">Width</div><select id="s-iw" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>256</option><option>512</option><option selected>768</option><option>1024</option></select></div>
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">Height</div><select id="s-ih" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>256</option><option>512</option><option selected>768</option><option>1024</option></select></div>
+          </div>
+          <div style="font-size:9px;color:#4a6080;margin:10px 0 3px">Steps &mdash; <span id="s-sv">25</span></div>
+          <input type="range" id="s-ss" min="10" max="50" value="25" oninput="document.getElementById('s-sv').textContent=this.value" style="width:100%;accent-color:#6366f1;margin:2px 0">
+          <button onclick="sGen('image')" id="s-bi" style="width:100%;padding:11px;background:linear-gradient(135deg,#6366f1,#818cf8);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE IMAGE</button>
+          <div id="s-il" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #6366f1;padding-left:8px">OUTPUT</div>
+          <div id="s-io" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">OUTPUT APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEOS -->
+    <div id="spane-videos" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #7c3aed;padding-left:8px">VIDEO GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Prompt</div>
+          <textarea id="s-vp" rows="3" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">cinematic drone shot, ocean waves, slow motion...</textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">Frames</div><select id="s-vf" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>4</option><option>6</option><option selected>8</option><option>12</option><option>16</option></select></div>
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">FPS</div><select id="s-vr" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>4</option><option>6</option><option selected>8</option><option>12</option></select></div>
+          </div>
+          <div style="font-size:9px;color:#4a6080;margin:10px 0 3px">Steps &mdash; <span id="s-vs">15</span></div>
+          <input type="range" id="s-vi" min="5" max="30" value="15" oninput="document.getElementById('s-vs').textContent=this.value" style="width:100%;accent-color:#7c3aed;margin:2px 0">
+          <button onclick="sGen('video')" id="s-bv" style="width:100%;padding:11px;background:linear-gradient(135deg,#6d28d9,#7c3aed);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE VIDEO</button>
+          <div id="s-vl" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #7c3aed;padding-left:8px">OUTPUT</div>
+          <div id="s-vo" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">VIDEO APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D MODELS -->
+    <div id="spane-3ds" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #d97706;padding-left:8px">3D MODEL GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Object Description</div>
+          <textarea id="s-dp" rows="3" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">sports car, red metallic, detailed, realistic...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:10px 0 3px">Steps &mdash; <span id="s-ds">20</span></div>
+          <input type="range" id="s-di" min="10" max="64" value="20" oninput="document.getElementById('s-ds').textContent=this.value" style="width:100%;accent-color:#d97706;margin:2px 0">
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px">Output Format</div>
+          <select id="s-df" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option value="obj">OBJ &mdash; Universal (Blender/Maya)</option><option value="glb">GLB &mdash; Web 3D</option></select>
+          <button onclick="sGen('3d')" id="s-b3" style="width:100%;padding:11px;background:linear-gradient(135deg,#d97706,#f59e0b);border:none;border-radius:5px;color:#000;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE 3D</button>
+          <div id="s-dl" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #d97706;padding-left:8px">OUTPUT</div>
+          <div id="s-do" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">3D PREVIEW HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIO -->
+    <div id="spane-audios" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #9333ea;padding-left:8px">AUDIO GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Prompt / Text</div>
+          <textarea id="s-ap" rows="4" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">Welcome to VNT World AI Division...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px">Type</div>
+          <select id="s-am" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option value="speech">Speech &mdash; TTS (fast)</option><option value="music">Music &mdash; MusicGen</option></select>
+          <button onclick="sGen('audio')" id="s-ba" style="width:100%;padding:11px;background:linear-gradient(135deg,#9333ea,#c026d3);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE AUDIO</button>
+          <div id="s-al" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #9333ea;padding-left:8px">OUTPUT</div>
+          <div id="s-ao" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">AUDIO APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2D DRAWINGS -->
+    <div id="spane-2ds" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #ea580c;padding-left:8px">2D DRAWING GENERATOR</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Description</div>
+          <textarea id="s-tp" rows="4" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">floor plan 3 bedroom 15x12m</textarea>
+          <button onclick="sGen('2d')" id="s-b2" style="width:100%;padding:11px;background:linear-gradient(135deg,#ea580c,#f97316);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">GENERATE 2D DRAWING</button>
+          <div id="s-tl" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #ea580c;padding-left:8px">OUTPUT</div>
+          <div id="s-to" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">DRAWING APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- CODING -->
+    <div id="spane-coding" style="display:none">
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;height:100%">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #10b981;padding-left:8px">AI CODE GENERATOR</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Language</div>
+          <select id="s-lang" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:7px;border-radius:5px;font-size:11px;margin-bottom:8px">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="html">HTML / CSS</option>
+            <option value="react">React (JSX)</option>
+            <option value="nodejs">Node.js</option>
+            <option value="bash">Bash / Shell</option>
+            <option value="sql">SQL</option>
+            <option value="cpp">C / C++</option>
+            <option value="java">Java</option>
+            <option value="swift">Swift</option>
+          </select>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">What to build</div>
+          <textarea id="s-code-prompt" rows="5" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace;line-height:1.5">A REST API endpoint that accepts a POST request with JSON body containing name and email, validates them, and returns a success response...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Mode</div>
+          <select id="s-code-mode" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:7px;border-radius:5px;font-size:11px;margin-bottom:8px">
+            <option value="generate">Generate Code</option>
+            <option value="explain">Explain Code</option>
+            <option value="fix">Fix / Debug</option>
+            <option value="optimize">Optimize</option>
+            <option value="convert">Convert Language</option>
+            <option value="document">Add Documentation</option>
+            <option value="test">Write Tests</option>
+          </select>
+          <button onclick="genCode()" id="s-code-btn" style="width:100%;padding:11px;background:linear-gradient(135deg,#059669,#10b981);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:4px;font-family:monospace">&#9001;&#9002; GENERATE CODE</button>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button onclick="copyCode()" style="flex:1;padding:7px;background:#111820;border:1px solid #1e2a38;border-radius:5px;color:#4a6080;font-size:10px;cursor:pointer;font-family:monospace">&#10063; Copy</button>
+            <button onclick="clearCode()" style="flex:1;padding:7px;background:#111820;border:1px solid #1e2a38;border-radius:5px;color:#4a6080;font-size:10px;cursor:pointer;font-family:monospace">&#10005; Clear</button>
+          </div>
+          <div id="s-code-log" style="font-size:10px;color:#4a6080;margin-top:8px;font-family:monospace">// ready</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:9px;letter-spacing:2px;color:#4a6080;border-left:2px solid #10b981;padding-left:8px">OUTPUT</div>
+            <div id="s-code-lang-badge" style="font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10b981;letter-spacing:1px">PYTHON</div>
+          </div>
+          <div style="position:relative;flex:1">
+            <pre id="s-code-out" style="background:#060d14;border:1px solid #1e2a38;border-radius:8px;padding:16px;margin:0;font-size:12px;font-family:'Courier New',monospace;color:#a8e6cf;overflow:auto;min-height:380px;white-space:pre-wrap;line-height:1.6"><span style="color:#1e2a38">// Code output appears here...</span></pre>
+          </div>
+          <!-- Also allow paste/edit your own code -->
+          <div>
+            <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:6px;border-left:2px solid #1e2a38;padding-left:8px">PASTE YOUR CODE HERE TO EXPLAIN / FIX / OPTIMIZE</div>
+            <textarea id="s-code-input" rows="5" placeholder="Paste existing code here for explain/fix/optimize modes..." style="width:100%;background:#060d14;border:1px solid #1e2a38;color:#a8e6cf;padding:10px;border-radius:5px;resize:vertical;font-size:11px;font-family:'Courier New',monospace;line-height:1.6"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEVELOPMENT -->
+    <div id="spane-dev" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <!-- App Dev Card -->
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:18px">
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #6366f1;padding-left:8px">APP DEVELOPMENT</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div onclick="window.open('http://192.168.10.94:7861','_blank')" style="padding:10px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+              <div><div style="font-size:12px;color:#e8f0f8;font-weight:600">ComfyUI</div><div style="font-size:12px;color:#4a6080;margin-top:2px">AI workflow builder on M4</div></div>
+              <span style="color:#6366f1;font-size:16px">&#8599;</span>
+            </div>
+            <div onclick="window.open('https://github.com/virtualnetworkteam-VNT','_blank')" style="padding:10px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+              <div><div style="font-size:12px;color:#e8f0f8;font-weight:600">GitHub — VNT</div><div style="font-size:12px;color:#4a6080;margin-top:2px">All VNT repositories</div></div>
+              <span style="color:#6366f1;font-size:16px">&#8599;</span>
+            </div>
+            <div onclick="window.open('http://192.168.10.10','_blank')" style="padding:10px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+              <div><div style="font-size:12px;color:#e8f0f8;font-weight:600">Nextcloud</div><div style="font-size:12px;color:#4a6080;margin-top:2px">File storage and sharing</div></div>
+              <span style="color:#6366f1;font-size:16px">&#8599;</span>
+            </div>
+          </div>
+        </div>
+        <!-- Web Dev Card -->
+        <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:18px">
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #0ea5e9;padding-left:8px">WEBSITE DEVELOPMENT</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div onclick="window.open('https://vntworld.com','_blank')" style="padding:10px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.borderColor='#0ea5e9'" onmouseout="this.style.borderColor='#1e2a38'">
+              <div><div style="font-size:12px;color:#e8f0f8;font-weight:600">vntworld.com</div><div style="font-size:12px;color:#4a6080;margin-top:2px">Production — CT108</div></div>
+              <span id="site-status" style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:#00e676">LIVE</span>
+            </div>
+            <div onclick="window.open('http://192.168.10.96:8888','_blank')" style="padding:10px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.borderColor='#0ea5e9'" onmouseout="this.style.borderColor='#1e2a38'">
+              <div><div style="font-size:12px;color:#e8f0f8;font-weight:600">Internal Portal</div><div style="font-size:12px;color:#4a6080;margin-top:2px">MSI — port 8888</div></div>
+              <span style="color:#0ea5e9;font-size:16px">&#8599;</span>
+            </div>
+            <div onclick="window.open('https://CulturalAssetsGroup.io','_blank')" style="padding:10px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.borderColor='#0ea5e9'" onmouseout="this.style.borderColor='#1e2a38'">
+              <div><div style="font-size:12px;color:#e8f0f8;font-weight:600">CulturalAssetsGroup.io</div><div style="font-size:12px;color:#4a6080;margin-top:2px">Game — Luc / Zeus</div></div>
+              <span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(255,140,0,.1);border:1px solid rgba(255,140,0,.3);color:#ff8c00">IN DEV</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- AI-assisted prompt for dev tasks -->
+      <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:18px">
+        <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #10b981;padding-left:8px">AI DEVELOPMENT ASSISTANT</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start">
+          <textarea id="s-dev-prompt" rows="3" placeholder="Describe what you want to build, fix, or plan..." style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:9px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace;line-height:1.5"></textarea>
+          <select id="s-dev-type" style="background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:8px;border-radius:5px;font-size:11px">
+            <option value="plan">Project Plan</option>
+            <option value="architecture">Architecture</option>
+            <option value="api">API Design</option>
+            <option value="database">Database Schema</option>
+            <option value="deploy">Deploy Steps</option>
+          </select>
+        </div>
+        <button onclick="genDev()" id="s-dev-btn" style="padding:10px 20px;background:linear-gradient(135deg,#059669,#10b981);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:10px;font-family:monospace">&#9001;&#9002; GENERATE PLAN</button>
+        <div id="s-dev-log" style="font-size:10px;color:#4a6080;margin-top:8px;font-family:monospace">// ready</div>
+        <pre id="s-dev-out" style="display:none;background:#060d14;border:1px solid #1e2a38;border-radius:6px;padding:14px;margin-top:10px;font-size:11px;font-family:'Courier New',monospace;color:#a8e6cf;overflow:auto;max-height:250px;white-space:pre-wrap;line-height:1.6"></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+    
+    
+  
+<div class="pane" id="p-games">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">VNT GAMES</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s" onclick="window.open('http://192.168.10.96:8888/games/hbird/index.html','_blank')" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+      <div style="height:130px;background:linear-gradient(135deg,#0a2a1a,#0d3a22);display:flex;align-items:center;justify-content:center;font-size:50px">&#128038;</div>
+      <div style="padding:14px">
+        <div style="font-weight:700;color:#e8f0f8;font-size:13px">HannahBird.io</div>
+        <div style="font-size:10px;color:#4a6080;margin-top:4px">Tap to fly. Avoid obstacles.</div>
+        <span style="display:inline-block;font-size:9px;padding:2px 8px;border-radius:3px;border:1px solid rgba(0,230,118,.3);color:#00e676;background:rgba(0,230,118,.06);margin-top:8px;letter-spacing:1px">LIVE</span>
+      </div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s" onclick="window.open('https://github.com/virtualnetworkteam-VNT/StateIO-Game','_blank')" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+      <div style="height:130px;background:linear-gradient(135deg,#0a1a2e,#0d2540);display:flex;align-items:center;justify-content:center;font-size:50px">&#127759;</div>
+      <div style="padding:14px">
+        <div style="font-weight:700;color:#e8f0f8;font-size:13px">CulturalAssetsGroup.io</div>
+        <div style="font-size:10px;color:#4a6080;margin-top:4px">Territory capture strategy game.</div>
+        <span style="display:inline-block;font-size:9px;padding:2px 8px;border-radius:3px;border:1px solid rgba(255,140,0,.3);color:#ff8c00;background:rgba(255,140,0,.06);margin-top:8px;letter-spacing:1px">IN DEVELOPMENT</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pane" id="p-apps">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">APPLICATIONS</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:600;color:#e8f0f8;font-size:13px">&#128038; HannahBird — Android APK</div>
+        <div style="font-size:10px;color:#4a6080;margin-top:3px">VNT bird game for Android</div>
+      </div>
+      <a href="/downloads/HannahBird.apk" download style="padding:7px 16px;border:1px solid rgba(0,230,118,.3);border-radius:6px;color:#00e676;font-size:11px;text-decoration:none;background:rgba(0,230,118,.06)">&#8659; Download APK</a>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:600;color:#e8f0f8;font-size:13px">&#127759; CulturalAssetsGroup.io — Android APK</div>
+        <div style="font-size:10px;color:#4a6080;margin-top:3px">Territory strategy game — in development</div>
+      </div>
+      <span style="padding:7px 16px;border:1px solid #1e2a38;border-radius:6px;color:#4a6080;font-size:11px">In Development</span>
+    </div>
+    <div id="gen-apps-list"><div style="color:#4a6080;font-size:11px;padding:10px 0">Loading generated apps...</div></div>
+  </div>
+</div>
+<div class="pane" id="p-desk1">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">DESKTOP 1 — PROJECTS</div>
+  <div style="background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.1));border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:16px;margin-bottom:16px">
+    <div style="font-size:11px;color:#94a3b8;line-height:1.6">Project files and documents. Access via <a href="http://192.168.10.10" target="_blank" style="color:#818cf8">Nextcloud</a> or Samba <span style="font-family:monospace;color:#818cf8">\\192.168.10.96</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px" id="desk1-grid">
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;cursor:pointer" onclick="window.open('/generated/BirdHouse_Presentation.pptx','_blank')">
+      <div style="font-size:30px;margin-bottom:8px">&#128202;</div>
+      <div style="font-size:10px;color:#e8f0f8">BirdHouse Presentation</div>
+      <div style="font-size:9px;color:#4a6080;margin-top:3px">.pptx</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;cursor:pointer" onclick="window.open('/generated/birdhouse_site_plan.dxf','_blank')">
+      <div style="font-size:30px;margin-bottom:8px">&#128208;</div>
+      <div style="font-size:10px;color:#e8f0f8">BirdHouse Site Plan</div>
+      <div style="font-size:9px;color:#4a6080;margin-top:3px">.dxf</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;cursor:pointer" onclick="window.open('/generated/bird_house_proposal.html','_blank')">
+      <div style="font-size:30px;margin-bottom:8px">&#127981;</div>
+      <div style="font-size:10px;color:#e8f0f8">BirdHouse Proposal</div>
+      <div style="font-size:9px;color:#4a6080;margin-top:3px">.html</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:14px;text-align:center;cursor:pointer" onclick="window.open('http://192.168.10.10','_blank')">
+      <div style="font-size:30px;margin-bottom:8px">&#9729;</div>
+      <div style="font-size:10px;color:#e8f0f8">Nextcloud</div>
+      <div style="font-size:9px;color:#4a6080;margin-top:3px">All files</div>
+    </div>
+  </div>
+</div>
+<div class="pane" id="p-desk2">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">DESKTOP 2 — GENERATED MEDIA</div>
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="loadDesk2()" style="padding:7px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;color:#818cf8;font-size:11px;cursor:pointer;font-family:monospace">&#8635; Refresh</button>
+    <a href="http://192.168.10.94:3333/list" target="_blank" style="padding:7px 14px;background:#111820;border:1px solid #1e2a38;border-radius:6px;color:#4a6080;font-size:11px;text-decoration:none">&#128193; All Files</a>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px" id="desk2-grid">
+    <div style="color:#4a6080;font-size:11px;padding:10px;grid-column:1/-1">Click Refresh to load media files from studio</div>
+  </div>
+</div>
+<div class="pane" id="p-users">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <h2 style="font-size:14px;font-weight:700;letter-spacing:2px">USER MANAGEMENT</h2>
+        <button class="btn-p" onclick="document.getElementById('nuf').style.display='block'">+ NEW USER</button>
+      </div>
+      <div id="nuf" style="display:none;background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:20px;margin-bottom:16px">
+        <div style="font-size:11px;letter-spacing:2px;color:#818cf8;margin-bottom:14px">CREATE USER</div>
+        <input class="inp" id="nu-id" placeholder="Email (e.g. john@vntworld.com)">
+        <input class="inp" id="nu-name" placeholder="Full Name">
+        <input class="inp" id="nu-pwd" type="password" placeholder="Temporary Password">
+        <select class="inp" id="nu-role">
+          <option value="user">User — WebUI only</option>
+          <option value="media">Media — WebUI + Studio</option>
+          <option value="admin">Admin — Full Access</option>
+        </select>
+        <div style="display:flex;gap:10px">
+          <button class="btn-p" onclick="createUser()">CREATE</button>
+          <button class="btn-s" onclick="document.getElementById('nuf').style.display='none'">CANCEL</button>
+        </div>
+        <div id="cu-msg" style="font-size:12px;margin-top:8px;text-align:center"></div>
+      </div>
+      <div class="ugrid" id="userList"></div>
+    </div>
+<div class="pane" id="p-profile">
+      <h2 style="font-size:14px;font-weight:700;letter-spacing:2px;margin-bottom:20px">MY PROFILE</h2>
+      <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:24px;max-width:400px">
+        <div style="margin-bottom:16px">
+          <div style="font-size:11px;color:#4a6080;margin-bottom:4px">NAME</div>
+          <div id="prof-name" style="font-size:15px;font-weight:600"></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;color:#4a6080;margin-bottom:4px">USER ID</div>
+          <div id="prof-id" style="font-size:13px;color:#818cf8"></div>
+        </div>
+        <div style="font-size:12px;letter-spacing:2px;color:#818cf8;margin-bottom:14px">CHANGE PASSWORD</div>
+        <input class="inp" id="pwd-cur" type="password" placeholder="Current Password">
+        <input class="inp" id="pwd-new" type="password" placeholder="New Password">
+        <input class="inp" id="pwd-cfm" type="password" placeholder="Confirm New Password">
+        <button class="btn-p" onclick="changePassword()">UPDATE PASSWORD</button>
+        <div id="pwd-msg" style="font-size:12px;margin-top:8px;text-align:center"></div>
+      </div>
+    </div>
+</div>
+</div>
+<script>
+function logout(){
+  localStorage.removeItem('vnt_token');
+  localStorage.removeItem('vnt_user');sessionStorage.removeItem("vnt_user");window.location.href="/login.html";}
+var _u_raw=sessionStorage.getItem("vnt_user")||localStorage.getItem("vnt_user")||"null";
+const u=JSON.parse(_u_raw);
+if(!u)window.location.href="/login.html";
+else{
+  document.getElementById("uAvatar").textContent=u.name[0].toUpperCase();
+  document.getElementById("uName").textContent=u.name;
+  document.getElementById("uRole").textContent="["+u.role.toUpperCase()+"]";
+  document.getElementById("wName").textContent=u.name;
+  document.getElementById("prof-name").textContent=u.name;
+  document.getElementById("prof-id").textContent=u.id;
+  // Role-based tab visibility
+  const role=u.role;
+  if(role==="admin"){
+    ["s-hier","s-studio","s-users"].forEach(id=>document.getElementById(id).classList.remove("off"));
+  } else if(role==="media"){
+    document.getElementById("s-studio").classList.remove("off");
+  }
+  // user always has webui - already enabled
+}
+const iframes={
+  hier:{src:"http://192.168.10.96:8888/vnt_hierarchy.html",loaded:false},
+  webui:{src:"http://192.168.10.96:3000/",loaded:false},
+  studio:{src:"http://192.168.10.96:8888/media.html",loaded:false}
+};
+function go(name){
+  document.querySelectorAll(".si").forEach(e=>e.classList.remove("active"));
+  document.querySelectorAll(".pane,.fpane").forEach(e=>e.classList.remove("active"));
+  document.getElementById("s-"+name).classList.add("active");
+  document.getElementById("p-"+name).classList.add("active");
+  if(name==="users")loadUsers();
+  if(iframes[name]&&!iframes[name].loaded){
+    var _fi=document.getElementById("f-"+name); if(_fi) _fi.src=iframes[name].src;
+    iframes[name].loaded=true;
+  }
+}
+async function loadUsers(){
+  const r=await fetch("/api/auth.php?action=list&token=vnt-admin-2025");
+  const d=await r.json();
+  document.getElementById("userList").innerHTML=(d.users||[]).map(u=>`
+    <div class="ucard">
+      <div><div style="font-size:13px;font-weight:600">${u.name}</div><div style="font-size:11px;color:#4a6080;margin-top:2px">${u.id}</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="badge">${u.role.toUpperCase()}</span><span style="font-size:10px;color:#4a6080">${u.created}</span></div>
+    </div>`).join("");
+}
+async function createUser(){
+  const id=document.getElementById("nu-id").value.trim();
+  const name=document.getElementById("nu-name").value.trim();
+  const pwd=document.getElementById("nu-pwd").value||"VNT@2025";
+  const role=document.getElementById("nu-role").value;
+  const msg=document.getElementById("cu-msg");
+  if(!id||!name){msg.style.color="#ff3d3d";msg.textContent="Name and ID required";return;}
+  const r=await fetch("/api/auth.php?action=create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:"vnt-admin-2025",id,name,password:pwd,role})});
+  const d=await r.json();
+  if(d.success){msg.style.color="#00e676";msg.textContent="✓ User created! Temp password: "+pwd;loadUsers();}
+  else{msg.style.color="#ff3d3d";msg.textContent=d.error||"Failed";}
+}
+async function changePassword(){
+  const cur=document.getElementById("pwd-cur").value;
+  const nw=document.getElementById("pwd-new").value;
+  const cfm=document.getElementById("pwd-cfm").value;
+  const msg=document.getElementById("pwd-msg");
+  if(nw!==cfm){msg.style.color="#ff3d3d";msg.textContent="Passwords do not match";return;}
+  if(nw.length<6){msg.style.color="#ff3d3d";msg.textContent="Min 6 characters";return;}
+  const r=await fetch("/api/auth.php?action=changepass",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:u.id,current:cur,newpass:nw})});
+  const d=await r.json();
+  if(d.success){msg.style.color="#00e676";msg.textContent="✓ Password updated!";}
+  else{msg.style.color="#ff3d3d";msg.textContent=d.error||"Failed";}
+}
+
+// Studio API endpoint (via MSI proxy)
+var SAPI="http://192.168.10.96:8888/api";
+
+// Check studio API
+function chkStudio(){
+  fetch(SAPI+"/health",{signal:AbortSignal.timeout(6000)})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.status==="online"){
+      var dot=document.getElementById("stu-dot");
+      var txt=document.getElementById("stu-txt");
+      var cd=document.getElementById("comfy-dot2");
+      if(dot){dot.style.background="#00e676";}
+      if(txt){txt.textContent="Studio online";txt.style.color="#00e676";}
+      if(cd){cd.style.background=d.comfyui==="ok"?"#00e676":"#ff8c00";}
+    }
+  }).catch(function(){
+    var dot=document.getElementById("stu-dot");
+    var txt=document.getElementById("stu-txt");
+    if(dot)dot.style.background="#ff3b5c";
+    if(txt){txt.textContent="Studio offline";txt.style.color="#ff3b5c";}
+    setTimeout(chkStudio,15000);
+  });
+}
+
+// Studio tabs
+function stuTab(tab, el){
+  document.querySelectorAll("[id^='spane-']").forEach(function(p){p.style.display="none";});
+  document.querySelectorAll("[id^='stab-']").forEach(function(b){
+    b.style.color="#4a6080";b.style.borderBottomColor="transparent";
+  });
+  var pane=document.getElementById("spane-"+tab);
+  if(pane) pane.style.display="block";
+  if(el){el.style.color="#818cf8";el.style.borderBottomColor="#6366f1";}
+}
+
+// Studio generation
+function sLog(id,m,ok){
+  var e=document.getElementById(id);
+  if(e){e.textContent=m;e.style.color=ok?"#00e676":m.includes("error")?"#ff3b5c":"#4a6080";}
+}
+function sBtnD(id,d,t){var b=document.getElementById(id);if(b){b.disabled=d;if(t)b.textContent=t;}}
+
+function sGen(type){
+  var ep,data,outId,logId,btnId;
+  if(type==="image"){
+    ep="/generate";
+    data={prompt:document.getElementById("s-ip").value,
+      width:parseInt(document.getElementById("s-iw").value),
+      height:parseInt(document.getElementById("s-ih").value),
+      steps:parseInt(document.getElementById("s-ss").value)};
+    outId="s-io";logId="s-il";btnId="s-bi";
+    sBtnD(btnId,true,"Generating...");sLog(logId,"// generating image (1-5 min)...",false);
+  }else if(type==="video"){
+    ep="/generate-video";
+    data={prompt:document.getElementById("s-vp").value,
+      frames:parseInt(document.getElementById("s-vf").value),
+      fps:parseInt(document.getElementById("s-vr").value),
+      steps:parseInt(document.getElementById("s-vi").value)};
+    outId="s-vo";logId="s-vl";btnId="s-bv";
+    sBtnD(btnId,true,"Generating (3-8 min)...");sLog(logId,"// generating video...",false);
+  }else if(type==="3d"){
+    ep="/generate-3d";
+    data={prompt:document.getElementById("s-dp").value};
+    outId="s-do";logId="s-dl";btnId="s-b3";
+    sBtnD(btnId,true,"Generating (2-5 min)...");sLog(logId,"// generating 3D model...",false);
+  }else if(type==="audio"){
+    ep="/generate-audio";
+    data={text:document.getElementById("s-ap").value,type:document.getElementById("s-am").value};
+    outId="s-ao";logId="s-al";btnId="s-ba";
+    sBtnD(btnId,true,"Generating...");sLog(logId,"// generating audio...",false);
+  }else if(type==="2d"){
+    ep="/generate";
+    data={prompt:document.getElementById("s-tp").value+", 2D architectural blueprint, technical drawing, clean lines",width:512,height:512,steps:20};
+    outId="s-to";logId="s-tl";btnId="s-b2";
+    sBtnD(btnId,true,"Drawing...");sLog(logId,"// generating 2D drawing...",false);
+  }
+  var ctrl=new AbortController();
+  var timer=setTimeout(function(){ctrl.abort();},660000);
+  var ms=type==="video"?660000:360000;
+  fetch(SAPI+ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data),signal:ctrl.signal})
+  .then(function(r){clearTimeout(timer);return r.json();})
+  .then(function(d){
+    var out=document.getElementById(outId);
+    var url=d.url||(d.path?"http://192.168.10.96:8888/api/file/"+d.path.split("/").pop():null);
+    if(type==="3d"){
+      var h="";
+      if(d.preview_url)h+="<img src='"+d.preview_url+"?t="+Date.now()+"' style='max-height:260px;border-radius:4px'>";
+      if(d.gif_url)h+=" <img src='"+d.gif_url+"?t="+Date.now()+"' style='max-height:260px;border-radius:4px'>";
+      if(d.obj_url)h+="<br><a href='"+d.obj_url+"' style='color:#f59e0b;font-size:11px;text-decoration:none'>&#8659; Download OBJ</a>";
+      if(h){out.innerHTML=h;sLog(logId,"// done!",true);}
+      else sLog(logId,"// "+(d.info||d.status||"generating"),false);
+    }else if(url){
+      if(type==="video") out.innerHTML="<video src='"+url+"' controls style='max-width:100%;max-height:300px;border-radius:4px'></video>";
+      else if(type==="audio") out.innerHTML="<audio src='"+url+"' controls style='width:100%'></audio>";
+      else out.innerHTML="<img src='"+url+"?t="+Date.now()+"' style='max-width:100%;max-height:300px;border-radius:4px'>";
+      sLog(logId,"// done — "+url,true);
+    }else{
+      sLog(logId,"// error: "+JSON.stringify(d).slice(0,80),false);
+    }
+    var btnLabel={"image":"&#9654; GENERATE IMAGE","video":"&#9654; GENERATE VIDEO","3d":"&#9654; GENERATE 3D","audio":"&#9654; GENERATE AUDIO","2d":"GENERATE 2D DRAWING"};
+    sBtnD(btnId,false,btnLabel[type]);
+  })
+  .catch(function(e){
+    clearTimeout(timer);
+    sLog(logId,"// error: "+e.message,false);
+    var btnId2={"image":"s-bi","video":"s-bv","3d":"s-b3","audio":"s-ba","2d":"s-b2"}[type];
+    sBtnD(btnId2,false,null);
+  });
+}
+
+// Init studio when navigating to it
+var _stuInit=false;
+var _origGo=go;
+go=function(name){
+  _origGo(name);
+  if(name==="studio"&&!_stuInit){
+    _stuInit=true;
+    chkStudio();
+    setInterval(chkStudio,30000);
+  }
+};
+
+
+// Agent status grid for overview
+var AGENTS_DATA=[
+  {n:'Alias',r:'CEO',s:'active',p:'8443'},
+  {n:'Zeus',r:'IT Director',s:'standby',p:'7777'},
+  {n:'Maya',r:'Finance',s:'active',p:'7778'},
+  {n:'Ava',r:'Documents',s:'active',p:'7779'},
+  {n:'Julian',r:'Project Mgr',s:'active',p:'7780'},
+  {n:'Dr. Ethan',r:'Medical',s:'active',p:'7783'},
+  {n:'Lee',r:'Marketing',s:'active',p:'7782'},
+  {n:'Amr',r:'Legal',s:'active',p:'7783'},
+  {n:'Nova',r:'Architect',s:'active',p:'7784'},
+  {n:'Mia',r:'Reception',s:'active',p:'9999'},
+  {n:'Specter',r:'CyberSec',s:'active',p:'7788'},
+  {n:'Dina',r:'Nurse',s:'active',p:'7786'},
+  {n:'Luc',r:'Developer',s:'active',p:'7789'},
+  {n:'Ben',r:'IT Ops',s:'active',p:'7785'},
+  {n:'Jodi',r:'Research',s:'active',p:'7790'},
+  {n:'Rick',r:'Tech',s:'active',p:'7793'}
+];
+
+function getStatusColor(s){
+  return s==='active'?'#00e676':s==='working'||s==='engaged'?'#2979ff':s==='standby'||s==='idle'?'#ff8c00':'#ff3b5c';
+}
+function getStatusLabel(s){
+  return s==='active'?'Active':s==='working'?'Engaged':s==='standby'?'Standby':'Offline';
+}
+
+function buildAgentGrid(){
+  var grid=document.getElementById('agent-status-grid');
+  if(!grid) return;
+  var html2='';
+  AGENTS_DATA.forEach(function(a){
+    var c=getStatusColor(a.s);
+    var lbl=getStatusLabel(a.s);
+    html2+='<div style="background:#0d1117;border:1px solid #1e2a38;border-radius:8px;padding:10px;text-align:center">'
+      +'<div style="font-size:13px;font-weight:700;color:#e8f0f8;margin-bottom:3px">'+a.n+'</div>'
+      +'<div style="font-size:10px;color:#4a6080;margin-bottom:6px">'+a.r+'</div>'
+      +'<span style="font-size:9px;padding:2px 8px;border-radius:10px;background:'+c+'22;border:1px solid '+c+'55;color:'+c+'">&#9679; '+lbl+'</span>'
+      +'</div>';
+  });
+  grid.innerHTML=html2;
+}
+document.addEventListener('DOMContentLoaded',buildAgentGrid);
+
+async function checkAuth(){
+  var token=localStorage.getItem('vnt_token');
+  var user=localStorage.getItem('vnt_user');
+  if(token&&user){
+    try{
+      var u=JSON.parse(user);
+      showDashboard(u);
+      return;
+    }catch(e){}
+  }
+  showLogin();
+}
+async function login(){
+  var id=(document.getElementById('loginId')||document.getElementById('loginEmail')||{}).value||'';
+  var pwd=(document.getElementById('loginPwd')||document.getElementById('loginPass')||{}).value||'';
+  var msg=document.getElementById('loginMsg');
+  if(!id||!pwd){if(msg)msg.textContent='Enter credentials';return;}
+  if(msg){msg.textContent='Signing in...';msg.style.color='#818cf8';}
+  // Local auth — no server needed
+  var USERS={
+    'ryan':       {pass:'USER_PW1',         name:'Ryan Khawaja', role:'admin'},
+    'khawaja':    {pass:'USER_PW2',name:'Ryan',       role:'admin'},
+    'administrator':{pass:'0568USER_PW1',   name:'Admin',        role:'admin'},
+    'kraheelw':   {pass:'USER_PW1',         name:'Ryan Khawaja', role:'admin'},
+    'kraheelw@vntworld.com':{pass:'USER_PW1',name:'Ryan Khawaja',role:'admin'}
+  };
+  var u=USERS[id.toLowerCase()]||USERS[id];
+  if(u&&u.pass===pwd){
+    var token='vnt-'+Date.now()+'-'+Math.random().toString(36).substr(2);
+    var userObj={id:id,name:u.name,role:u.role};
+    localStorage.setItem('vnt_token',token);
+    localStorage.setItem('vnt_user',JSON.stringify(userObj));
+    showDashboard(userObj);
+  }else{
+    if(msg){msg.textContent='Invalid credentials';msg.style.color='#ff3b5c';}
+  }
+}
+</script>
+<div class="pane" id="p-hier">
+  <div style="margin-bottom:20px">
+    <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:14px;border-left:3px solid #6366f1;padding-left:10px">ORGANIZATIONAL HIERARCHY</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:16px">All operations flow through Alias CEO. No bypassing. Violation = permanent deletion.</div>
+    <table style="width:100%;border-collapse:collapse;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;overflow:hidden">
+      <thead><tr style="background:#111820;border-bottom:1px solid #1e2a38">
+        <th style="padding:10px 14px;text-align:left;font-size:9px;letter-spacing:2px;color:#4a6080">AGENT</th>
+        <th style="padding:10px 14px;text-align:left;font-size:9px;letter-spacing:2px;color:#4a6080">ROLE</th>
+        <th style="padding:10px 14px;text-align:left;font-size:9px;letter-spacing:2px;color:#4a6080">REPORTS TO</th>
+        <th style="padding:10px 14px;text-align:left;font-size:9px;letter-spacing:2px;color:#4a6080">PORT</th>
+        <th style="padding:10px 14px;text-align:left;font-size:9px;letter-spacing:2px;color:#4a6080">STATUS</th>
+      </tr></thead>
+      <tbody id="hier-body"></tbody>
+    </table>
+  </div>
+</div>
+<div class="pane" id="p-webui">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">WEB INTERFACES</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+    <div class="wcard" onclick="window.open('http://192.168.10.10','_blank')" style="cursor:pointer">
+      <div style="font-size:9px;letter-spacing:2px;color:#818cf8;margin-bottom:8px">NEXTCLOUD</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">File Server</div>
+      <div style="font-size:11px;color:#94a3b8">Access all VNT files and documents</div>
+      <div style="font-size:10px;color:#4a6080;margin-top:10px;font-family:monospace">192.168.10.10</div>
+    </div>
+    <div class="wcard" onclick="window.open('http://192.168.10.94:7861','_blank')" style="cursor:pointer">
+      <div style="font-size:9px;letter-spacing:2px;color:#818cf8;margin-bottom:8px">COMFYUI</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">AI Image Studio</div>
+      <div style="font-size:11px;color:#94a3b8">Advanced AI generation on M4 MacBook</div>
+      <div style="font-size:10px;color:#4a6080;margin-top:10px;font-family:monospace">192.168.10.94:7861</div>
+    </div>
+    <div class="wcard" onclick="window.open('https://192.168.10.96:8443','_blank')" style="cursor:pointer">
+      <div style="font-size:9px;letter-spacing:2px;color:#00e676;margin-bottom:8px">LIVE</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Alias Voice</div>
+      <div style="font-size:11px;color:#94a3b8">Real-time voice call with Alias CEO</div>
+      <div style="font-size:10px;color:#4a6080;margin-top:10px;font-family:monospace">192.168.10.96:8443</div>
+    </div>
+    <div class="wcard" onclick="window.open('http://192.168.10.96:8888','_blank')" style="cursor:pointer">
+      <div style="font-size:9px;letter-spacing:2px;color:#818cf8;margin-bottom:8px">PORTAL</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">VNT Portal</div>
+      <div style="font-size:11px;color:#94a3b8">Internal portal with media studio</div>
+      <div style="font-size:10px;color:#4a6080;margin-top:10px;font-family:monospace">192.168.10.96:8888</div>
+    </div>
+  </div>
+</div>
+<div class="fpane" id="p-studio">
+<div style="display:flex;flex-direction:column;height:100%;background:#0f172a">
+  <!-- Studio top bar - minimal -->
+  <div style="background:#1e1b4b;border-bottom:1px solid #312e81;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <span style="font-size:11px;letter-spacing:3px;color:#818cf8;font-weight:700">VNT // MEDIA STUDIO</span>
+    <div style="display:flex;gap:14px;font-size:10px;align-items:center">
+      <span><span id="stu-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff8c00;margin-right:4px;vertical-align:middle"></span><span id="stu-txt" style="color:#ff8c00">Connecting...</span></span>
+      <span><span id="comfy-dot2" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:4px;vertical-align:middle"></span>ComfyUI</span>
+      <a href="http://192.168.10.94:7861" target="_blank" style="color:#4a6080;font-size:10px;text-decoration:none">M4 Node &#8599;</a>
+    </div>
+  </div>
+  <!-- Generation tabs -->
+  <div style="display:flex;border-bottom:1px solid #1e2a38;background:#0d1117;flex-shrink:0;overflow-x:auto">
+    <button onclick="stuTab('images',this)" id="stab-images" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid #6366f1;color:#818cf8;cursor:pointer;font-family:monospace;white-space:nowrap">&#9670; IMAGES</button>
+    <button onclick="stuTab('videos',this)" id="stab-videos" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9654; VIDEOS</button>
+    <button onclick="stuTab('3ds',this)" id="stab-3ds" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9679; 3D MODELS</button>
+    <button onclick="stuTab('audios',this)" id="stab-audios" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9836; AUDIO</button>
+    <button onclick="stuTab('2ds',this)" id="stab-2ds" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9633; 2D DRAWINGS</button>
+    <button onclick="stuTab('coding',this)" id="stab-coding" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9001; CODING</button>
+    <button onclick="stuTab('dev',this)" id="stab-dev" style="padding:10px 18px;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:#4a6080;cursor:pointer;font-family:monospace;white-space:nowrap">&#9964; DEVELOPMENT</button>
+  </div>
+  <!-- Generation panels -->
+  <div style="flex:1;overflow-y:auto;padding:20px">
+
+    <!-- IMAGES -->
+    <div id="spane-images" style="display:block">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #6366f1;padding-left:8px">IMAGE GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;letter-spacing:1px;text-transform:uppercase">Prompt</div>
+          <textarea id="s-ip" rows="3" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">professional portrait, cinematic lighting, Sony A7R4...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;letter-spacing:1px;text-transform:uppercase">Negative Prompt</div>
+          <textarea id="s-in" rows="2" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">blurry, watermark, low quality...</textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">Width</div><select id="s-iw" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>256</option><option>512</option><option selected>768</option><option>1024</option></select></div>
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">Height</div><select id="s-ih" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>256</option><option>512</option><option selected>768</option><option>1024</option></select></div>
+          </div>
+          <div style="font-size:9px;color:#4a6080;margin:10px 0 3px">Steps &mdash; <span id="s-sv">25</span></div>
+          <input type="range" id="s-ss" min="10" max="50" value="25" oninput="document.getElementById('s-sv').textContent=this.value" style="width:100%;accent-color:#6366f1;margin:2px 0">
+          <button onclick="sGen('image')" id="s-bi" style="width:100%;padding:11px;background:linear-gradient(135deg,#6366f1,#818cf8);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE IMAGE</button>
+          <div id="s-il" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #6366f1;padding-left:8px">OUTPUT</div>
+          <div id="s-io" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">OUTPUT APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEOS -->
+    <div id="spane-videos" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #7c3aed;padding-left:8px">VIDEO GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Prompt</div>
+          <textarea id="s-vp" rows="3" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">cinematic drone shot, ocean waves, slow motion...</textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">Frames</div><select id="s-vf" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>4</option><option>6</option><option selected>8</option><option>12</option><option>16</option></select></div>
+            <div><div style="font-size:9px;color:#4a6080;margin-bottom:3px">FPS</div><select id="s-vr" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option>4</option><option>6</option><option selected>8</option><option>12</option></select></div>
+          </div>
+          <div style="font-size:9px;color:#4a6080;margin:10px 0 3px">Steps &mdash; <span id="s-vs">15</span></div>
+          <input type="range" id="s-vi" min="5" max="30" value="15" oninput="document.getElementById('s-vs').textContent=this.value" style="width:100%;accent-color:#7c3aed;margin:2px 0">
+          <button onclick="sGen('video')" id="s-bv" style="width:100%;padding:11px;background:linear-gradient(135deg,#6d28d9,#7c3aed);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE VIDEO</button>
+          <div id="s-vl" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #7c3aed;padding-left:8px">OUTPUT</div>
+          <div id="s-vo" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">VIDEO APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D MODELS -->
+    <div id="spane-3ds" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #d97706;padding-left:8px">3D MODEL GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Object Description</div>
+          <textarea id="s-dp" rows="3" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">sports car, red metallic, detailed, realistic...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:10px 0 3px">Steps &mdash; <span id="s-ds">20</span></div>
+          <input type="range" id="s-di" min="10" max="64" value="20" oninput="document.getElementById('s-ds').textContent=this.value" style="width:100%;accent-color:#d97706;margin:2px 0">
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px">Output Format</div>
+          <select id="s-df" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option value="obj">OBJ &mdash; Universal (Blender/Maya)</option><option value="glb">GLB &mdash; Web 3D</option></select>
+          <button onclick="sGen('3d')" id="s-b3" style="width:100%;padding:11px;background:linear-gradient(135deg,#d97706,#f59e0b);border:none;border-radius:5px;color:#000;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE 3D</button>
+          <div id="s-dl" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #d97706;padding-left:8px">OUTPUT</div>
+          <div id="s-do" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">3D PREVIEW HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIO -->
+    <div id="spane-audios" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #9333ea;padding-left:8px">AUDIO GENERATION</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Prompt / Text</div>
+          <textarea id="s-ap" rows="4" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">Welcome to VNT World AI Division...</textarea>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px">Type</div>
+          <select id="s-am" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#e8f0f8;padding:6px;border-radius:5px;font-size:11px"><option value="speech">Speech &mdash; TTS (fast)</option><option value="music">Music &mdash; MusicGen</option></select>
+          <button onclick="sGen('audio')" id="s-ba" style="width:100%;padding:11px;background:linear-gradient(135deg,#9333ea,#c026d3);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">&#9654; GENERATE AUDIO</button>
+          <div id="s-al" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #9333ea;padding-left:8px">OUTPUT</div>
+          <div id="s-ao" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">AUDIO APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2D DRAWINGS -->
+    <div id="spane-2ds" style="display:none">
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #ea580c;padding-left:8px">2D DRAWING GENERATOR</div>
+          <div style="font-size:9px;color:#4a6080;margin:8px 0 3px;text-transform:uppercase">Description</div>
+          <textarea id="s-tp" rows="4" style="width:100%;background:#111820;border:1px solid #1e2a38;color:#a8e6cf;padding:8px;border-radius:5px;resize:vertical;font-size:11px;font-family:monospace">floor plan 3 bedroom 15x12m</textarea>
+          <button onclick="sGen('2d')" id="s-b2" style="width:100%;padding:11px;background:linear-gradient(135deg,#ea580c,#f97316);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:12px;font-family:monospace">GENERATE 2D DRAWING</button>
+          <div id="s-tl" style="font-size:10px;color:#4a6080;margin-top:6px;font-family:monospace">// ready</div>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:#4a6080;margin-bottom:14px;border-left:2px solid #ea580c;padding-left:8px">OUTPUT</div>
+          <div id="s-to" style="min-height:300px;background:#0d1117;border:1px solid #1e2a38;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px">
+            <span style="color:#1e2a38;font-size:11px;letter-spacing:2px">DRAWING APPEARS HERE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<div class="pane" id="p-games">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">VNT GAMES</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s" onclick="window.open('http://192.168.10.96:8888/games/hbird/index.html','_blank')" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+      <div style="height:130px;background:linear-gradient(135deg,#0a2a1a,#0d3a22);display:flex;align-items:center;justify-content:center;font-size:50px">&#128038;</div>
+      <div style="padding:14px">
+        <div style="font-weight:700;color:#e8f0f8;font-size:13px">HannahBird.io</div>
+        <div style="font-size:10px;color:#4a6080;margin-top:4px">Tap to fly. Avoid obstacles.</div>
+        <span style="display:inline-block;font-size:9px;padding:2px 8px;border-radius:3px;border:1px solid rgba(0,230,118,.3);color:#00e676;background:rgba(0,230,118,.06);margin-top:8px;letter-spacing:1px">LIVE</span>
+      </div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s" onclick="window.open('https://github.com/virtualnetworkteam-VNT/StateIO-Game','_blank')" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#1e2a38'">
+      <div style="height:130px;background:linear-gradient(135deg,#0a1a2e,#0d2540);display:flex;align-items:center;justify-content:center;font-size:50px">&#127759;</div>
+      <div style="padding:14px">
+        <div style="font-weight:700;color:#e8f0f8;font-size:13px">CulturalAssetsGroup.io</div>
+        <div style="font-size:10px;color:#4a6080;margin-top:4px">Territory capture strategy game.</div>
+        <span style="display:inline-block;font-size:9px;padding:2px 8px;border-radius:3px;border:1px solid rgba(255,140,0,.3);color:#ff8c00;background:rgba(255,140,0,.06);margin-top:8px;letter-spacing:1px">IN DEVELOPMENT</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pane" id="p-apps">
+  <div style="font-size:10px;letter-spacing:3px;color:#4a6080;margin-bottom:20px;border-left:3px solid #6366f1;padding-left:10px">APPLICATIONS</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="background:#0d1117;border:1px solid #1e2a38;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:600;color:#e8f0f8;font-size:13px">&#128038; HannahBe-t:#e8f0f8;word-break:break-all">${f.name}</div>
+        <div style="font-size:9px;color:#4a6080;margin-top:3px">${sz}</div>
+        <a href="${url}" download style="font-size:9px;color:#818cf8;text-decoration:none;display:block;margin-top:4px">&#8659; save</a>
+      </div>`;
+    }).join("");
+  }catch(e){
+    grid.innerHTML=`<div style="color:#4a6080;font-size:11px;padding:10px;grid-column:1/-1">Studio offline: ${e.message}</div>`;
+  }
+}
+
+
+// Code generation via Groq
+var GROQ_KEY='GROQ_PH';
+
+function updateLangBadge(){
+  var lang=document.getElementById("s-lang");
+  var badge=document.getElementById("s-code-lang-badge");
+  if(lang&&badge) badge.textContent=lang.options[lang.selectedIndex].text.split(" ")[0].toUpperCase();
+}
+document.addEventListener("DOMContentLoaded",function(){
+  var lang=document.getElementById("s-lang");
+  if(lang) lang.addEventListener("change",updateLangBadge);
+});
+
+async function callGroq(systemMsg,userMsg,model){
+  model=model||"llama3-70b-8192";
+  var r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+    method:"POST",
+    headers:{"Authorization":"Bearer "+GROQ_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:model,
+      messages:[{role:"system",content:systemMsg},{role:"user",content:userMsg}],
+      temperature:0.3,max_tokens:3000
+    })
+  });
+  var d=await r.json();
+  if(d.choices&&d.choices[0]) return d.choices[0].message.content;
+  throw new Error(JSON.stringify(d).slice(0,100));
+}
+
+async function genCode(){
+  var btn=document.getElementById("s-code-btn");
+  var log=document.getElementById("s-code-log");
+  var out=document.getElementById("s-code-out");
+  var lang=document.getElementById("s-lang").value;
+  var mode=document.getElementById("s-code-mode").value;
+  var prompt=document.getElementById("s-code-prompt").value;
+  var existingCode=document.getElementById("s-code-input").value;
+  if(!prompt.trim()&&!existingCode.trim()){log.textContent="// enter a prompt or paste code";log.style.color="#ff3b5c";return;}
+  btn.disabled=true;btn.textContent="Generating...";
+  log.textContent="// calling AI...";log.style.color="#4a6080";
+  out.innerHTML="<span style='color:#4a6080'>// generating...</span>";
+  var systemMsg="You are an expert "+lang+" developer. Output ONLY clean, production-ready code. No markdown fences unless specifically requested. Add brief inline comments where helpful.";
+  var userMsg="";
+  if(mode==="generate") userMsg="Write "+lang+" code for: "+prompt;
+  else if(mode==="explain") userMsg="Explain this "+lang+" code clearly:
+
+"+existingCode;
+  else if(mode==="fix") userMsg="Fix and improve this "+lang+" code. Explain what was wrong:
+
+"+existingCode+"
+
+Issue described: "+prompt;
+  else if(mode==="optimize") userMsg="Optimize this "+lang+" code for performance and readability:
+
+"+existingCode;
+  else if(mode==="convert") userMsg="Convert this code to "+lang+":
+
+"+existingCode;
+  else if(mode==="document") userMsg="Add comprehensive documentation/comments to this "+lang+" code:
+
+"+existingCode;
+  else if(mode==="test") userMsg="Write unit tests for this "+lang+" code:
+
+"+existingCode;
+  try{
+    var result=await callGroq(systemMsg,userMsg);
+    out.textContent=result;
+    log.textContent="// done — "+result.length+" chars";log.style.color="#00e676";
+  }catch(e){
+    log.textContent="// error: "+e.message;log.style.color="#ff3b5c";
+    out.innerHTML="<span style='color:#ff3b5c'>Error: "+e.message+"</span>";
+  }
+  btn.disabled=false;btn.textContent="&#9001;&#9002; GENERATE CODE";
+}
+
+function copyCode(){
+  var out=document.getElementById("s-code-out");
+  if(!out) return;
+  navigator.clipboard.writeText(out.textContent).then(function(){
+    var log=document.getElementById("s-code-log");
+    if(log){log.textContent="// copied to clipboard";log.style.color="#00e676";}
+  });
+}
+function clearCode(){
+  var out=document.getElementById("s-code-out");
+  var inp=document.getElementById("s-code-input");
+  if(out) out.innerHTML="<span style='color:#1e2a38'>// Code output appears here...</span>";
+  if(inp) inp.value="";
+  var log=document.getElementById("s-code-log");
+  if(log){log.textContent="// cleared";log.style.color="#4a6080";}
+}
+
+async function genDev(){
+  var btn=document.getElementById("s-dev-btn");
+  var log=document.getElementById("s-dev-log");
+  var out=document.getElementById("s-dev-out");
+  var prompt=document.getElementById("s-dev-prompt").value;
+  var type=document.getElementById("s-dev-type").value;
+  if(!prompt.trim()){log.textContent="// enter a description";log.style.color="#ff3b5c";return;}
+  btn.disabled=true;btn.textContent="Generating...";
+  log.textContent="// calling AI...";log.style.color="#4a6080";
+  out.style.display="none";
+  var typeLabels={"plan":"project plan","architecture":"technical architecture","api":"API design","database":"database schema","deploy":"deployment steps"};
+  var systemMsg="You are a senior software architect at VNT World AI Division. Provide clear, practical "+typeLabels[type]+" for the described task. Be specific and actionable. Use bullet points and structure.";
+  var userMsg="Create a detailed "+typeLabels[type]+" for: "+prompt;
+  try{
+    var result=await callGroq(systemMsg,userMsg,"llama3-70b-8192");
+    out.textContent=result;out.style.display="block";
+    log.textContent="// done";log.style.color="#00e676";
+  }catch(e){
+    log.textContent="// error: "+e.message;log.style.color="#ff3b5c";
+  }
+  btn.disabled=false;btn.textContent="&#9001;&#9002; GENERATE PLAN";
+}
+
+
+// Live clock + date
+function updateClock(){
+  var now=new Date();
+  var days=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  var months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  var h=String(now.getHours()).padStart(2,"0");
+  var m=String(now.getMinutes()).padStart(2,"0");
+  var s=String(now.getSeconds()).padStart(2,"0");
+  var day=days[now.getDay()];
+  var date=String(now.getDate()).padStart(2,"0");
+  var mon=months[now.getMonth()];
+  var yr=now.getFullYear();
+  var el=document.getElementById("live-clock");
+  if(el){
+    el.innerHTML=day+", "+date+" "+mon+" "+yr+"&nbsp;&nbsp;<span style='color:#e8f0f8;font-weight:700'>"+h+":"+m+":"+s+"</span>";
+  }
+}
+updateClock();
+setInterval(updateClock,1000);
+
+</script>
+
+<script>
+// Prevent go() from crashing on null iframe
+(function(){
+  var origGo = window.go;
+  if(origGo) {
+    window.go = function(page) {
+      try { origGo(page); } catch(e) {
+        // Fallback: show pane directly
+        var pane = document.getElementById('p-'+page);
+        if(pane) {
+          document.querySelectorAll('.pane,.fpane').forEach(function(p){ 
+            p.classList.remove('active');
+            p.style.display='';
+          });
+          pane.classList.add('active');
+          pane.style.cssText='position:absolute!important;inset:0!important;display:block!important;overflow-y:auto!important;overflow-x:hidden!important;padding:24px!important;box-sizing:border-box!important;';
+        }
+      }
+    };
+  }
+})();
+</script>
+
+</body>
+</html>
