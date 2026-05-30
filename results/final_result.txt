@@ -1,0 +1,43 @@
+=======================================================
+FINAL FIX - PORTS, MISSING SCRIPTS, LANGGRAPH
+=======================================================
+
+[1] Stopping all agent services...
+  All stopped and killed
+
+[2] Finding actual service paths...
+  zeus-agent: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/zeus-agent/zeus.py ; i
+  maya-agent: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/maya-agent.py ; ignore
+  mia-agent: 
+
+[3] Writing all agent scripts...
+  Wrote 15/15 agent scripts + fixed service paths
+  Mia agent written (voice set in reception logic)
+
+[4] Fixing LangGraph...
+  LangGraph: FAILED: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+AttributeError: module 'la
+
+[5] Starting all services fresh...
+
+[6] Testing all ports...
+  Alias :8443: OK
+  Zeus :7777: DOWN
+  Maya :7778: OK
+  Ava :7779: OK
+  Julian :7780: OK
+  Ethan :7781: OK
+  Lee :7782: OK
+  Amr :7783: OK
+  Nova :7784: OK
+  Specter :7788: OK
+  Luc :7787: OK
+  Ben :7789: OK
+  Dina :7786: OK
+  Jodi :7790: OK
+  Rick :7791: OK
+  Mia :9999: DOWN
+
+  TOTAL: 14/16 agents responding
+  WhatsApp: 
