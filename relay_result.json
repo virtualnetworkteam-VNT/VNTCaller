@@ -1,11 +1,16 @@
 {
-  "ts": "20260530_1628",
+  "ts": "20260530_1630",
   "results": {
-    "msi_proxy": "PASS 200",
+    "dashboard_deploy": "PASS 37885b",
+    "proxy_running": "FAIL 0",
     "api_proxy": "FAIL 0",
-    "dashboard": "PASS 37885 /var/www/html/dashboard.html",
-    "ct108_dash_size": "37885b",
-    "vntworld": "PASS 39308b",
-    "m4_via_proxy": "FAIL 0"
+    "m4_direct": "{\"status\": \"online\", \"api\": \"VNT Studio v3.2\", \"co",
+    "vntworld.com/dashboard": "PASS 39308b",
+    "vntworld.com/app": "FAIL 0 HTTP Error 404: Not Foundb",
+    "CT108_internal": "PASS 37885b",
+    "MSI_proxy": "PASS 37885b",
+    "MSI_api": "FAIL 0 HTTP Error 404: File not foundb",
+    "Nextcloud": "PASS 33702b",
+    "audio_gen": "FAIL HTTP Error 501: Unsupported method ('POST')"
   }
 }
