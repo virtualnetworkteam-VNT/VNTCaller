@@ -1,0 +1,49 @@
+=======================================================
+FORCE FIX ZEUS + MIA SYSTEMD
+=======================================================
+
+[1] Finding all zeus unit files...
+  Zeus units found:
+/etc/systemd/system/multi-user.target.wants/zeus-monitor.service
+/etc/systemd/system/multi-user.target.wants/zeus-agent.service
+/etc/systemd/system/zeus-monitor.service
+/etc/systemd/system/zeus-agent.service
+/run/systemd/units/invocation:zeus-agent.service
+/run/systemd/units/invocation:zeus-monitor.service
+/home/k/.config/systemd/user/timers.target.wants/zeus-agent.timer
+/home/k/.config/systemd/user/default.target.wants/zeus-agent.service
+/home/k/.config/systemd/user/zeus-agent.timer
+/home/k/.config/systemd/user/zeus-agent.service
+  Active FragmentPath: /etc/systemd/system/zeus-agent.service
+  Drop-ins: 
+
+[2] Cleaning Zeus completely...
+  Zeus ExecStart now: { path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/k/zeus-agent/z
+  Zeus :7777: DOWN
+
+[3] Mia - force create unit...
+  Mia unit file: ls: cannot access '/etc/systemd/system/mia-agent.service': No such file or direc
+  Mia :9999: DOWN
+  Mia status: Unit mia-agent.service could not be found.
+
+[4] FINAL STATUS...
+  Alias :8443: OK
+  Zeus :7777: DOWN
+  Maya :7778: OK
+  Ava :7779: OK
+  Julian :7780: OK
+  Ethan :7781: OK
+  Lee :7782: OK
+  Amr :7783: OK
+  Nova :7784: OK
+  Specter :7788: OK
+  Luc :7787: OK
+  Ben :7789: OK
+  Dina :7786: OK
+  Jodi :7790: OK
+  Rick :7791: OK
+  Mia :9999: DOWN
+
+  AGENTS: 14/16 | Down: ['Zeus', 'Mia']
+  WhatsApp: running
+  Hierarchy page updated
