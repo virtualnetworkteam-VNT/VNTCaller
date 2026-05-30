@@ -1,1 +1,1 @@
-{"ts": "20260530_1712", "results": {"ts": "20260530_1712", "msi_8888": "200:37885", "msi_api": "0:timed out", "ct108_api": "FAIL:timed out", "vntworld_api": "FAIL:HTTP Error 403: Forbidden"}}
+{"ts": "20260530_1717", "results": {"ct108": "200:79887", "vntworld": "200:80806", "msi": "200:37885"}}
