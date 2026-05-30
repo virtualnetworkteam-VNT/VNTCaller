@@ -1,0 +1,36 @@
+=======================================================
+ZEUS+MIA MANUAL RUN DIAGNOSIS
+=======================================================
+
+[1] Zeus manual run (full error)...
+  Zeus output: Zeus :7777
+  Port 7777 held by: nothing
+
+[2] Mia manual run (full error)...
+  Mia output: Mia :9999
+  Port 9999 held by: nothing
+
+[3] Starting Zeus and Mia...
+  Zeus :7777: DOWN
+  Mia :9999: DOWN
+  Zeus status: 5337 /usr/bin/python3 /home/k/zeus-agent/zeus.py
+
+May 30 10:00:29 ai systemd[1]: zeus-agent.service: Scheduled restart job, restart counter is at 7.
+May 30 10:00:29 ai systemd[1]: Started zeus-agent.service - Zeus VNT IT Agent.
+May 30 10:00:30 ai python3[2105337]: Zeus agent starting on port 7777...
+  Mia status: Unit mia-agent.service could not be found.
+
+[4] LangGraph real import test...
+  Import test: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/k/.local/lib/python3.12/site-pac
+
+[5] WhatsApp (correct check)...
+  WA systemctl: active
+  WA process running: YES pid=1909682
+2105829
+
+[6] Final all 16...
+  TOTAL: 14/16 | Down: ['Zeus', 'Mia']
+  LangGraph: broken
+  WhatsApp process: running
