@@ -1,25 +1,23 @@
 =======================================================
-BUILD PORTAL + LOCATE/FIX M4 MEDIA
+M4 MEDIA API + RCA GUIDE
 =======================================================
 
-[1] Finding M4 media scripts...
-  Found scripts:
-/Users/alias/ai-3d/generate_3d_web.py
-/Users/alias/ai-3d/generate_3d.py
-/Users/alias/ai-audio/generate_audio.py
-/Users/alias/ComfyUI/middleware/__init__.py
-/Users/alias/ComfyUI/middleware/cache_middleware.py
-/Users/alias/ComfyUI/comfy/rmsnorm.py
-/Users/alias/ComfyUI/comfy/conds.py
-/Users/alias/ComfyUI/comfy/k_diffusion/utils.py
-/Users/alias/ComfyUI/comfy/k_diffusion/sampling.py
-/Users/alias/ComfyU
-  Generate scripts: 
-  Scripts referencing 3333: 
+[1] Building M4 media API server...
+  Image script: /Users/alias/ai-media/generate.py
+  Video script: /Users/alias/ai-video/generate_video.py
+  3D script: /Users/alias/ai-3d/generate_3d.py
+  Media API :3333: OK {"service": "VNT Media API", "status": "active", "port": 3333, "capabilities": [
+  Media API set to auto-start on M4 (LaunchAgent)
 
-[2] Building VNT Portal :8080...
-  Portal :8080: OK - login page serving
+[2] Saving complete RCA guide to MemPalace...
+  Full RCA guide saved to MemPalace
 
-[3] M4 Media API...
-  Generate.py check: YES2
-  Home .py files: 
+[3] Final verification...
+  Agents: 17/17
+  Web/Hierarchy: OK | Monitor: OK
+  Portal: OK | Media M4: OK | smbd: active
+
+=======================================================
+COMPLETE: 17/17 agents | Web OK | Portal OK | Monitor OK
+Media: OK | smbd: active
+=======================================================
