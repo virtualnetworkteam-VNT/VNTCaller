@@ -1,0 +1,24 @@
+=======================================================
+FORCE RECOVER ALIAS
+=======================================================
+
+[1] Manual run of current Alias...
+  Output: Alias SI-4.0 :8443
+Traceback (most recent call last):
+  File "/home/k/alias-voice-agent.py", line 181, in <module>
+    try:http.server.HTTPServer(('0.0.0.0',8443),H).serve_forever()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socketserver.py", line 457, in __init__
+
+[2] Clearing port 8443...
+  Port 8443 held by: clear
+
+[3] Finding a working backup...
+  /home/k/alias-voice-agent.py.working: valid syntax
+  /home/k/alias-voice-agent.py.working: still down after restart
+  /home/k/alias-voice-agent.py.bak_si5: valid syntax
+  RECOVERED from /home/k/alias-voice-agent.py.bak_si5: {"agent": "Alias", "role": "CEO", "status": "active", "model": "llama-
+
+[5] Final verify...
+  Agents: 19/19 | Down: []
+  Alias replies: I'm here, ready to assist and protect VNT World AI Division with all my capabili
