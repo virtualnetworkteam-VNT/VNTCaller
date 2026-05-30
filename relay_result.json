@@ -1,1 +1,1 @@
-{"ts": "20260530_2003", "results": {"dashboard": "PASS 118592b", "msi_api": "PASS 200", "ct108": "200:118592", "vntworld": "200:119511"}}
+{"ts": "20260530_2025", "results": {"portal_syntax": "OK", "watchdog": "installed", "crontab": "added 2 entries", "api_health": "PASS online", "mia_v2": "OK", "openclaw_keys": "['gateway', 'channels', 'models', 'agents', 'tools', 'commands']", "mia_in_oc": "not found", "mempalace": "WRITTEN"}}
