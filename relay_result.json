@@ -1,1 +1,1 @@
-{"ts": "20260530_1724", "results": {"ts": "20260530_1724", "m4_direct": "PASS", "msi_api": "PASS", "audio": "FAIL", "image": "PASS", "ct108": "200:79701", "vntworld": "200:80620"}}
+{"ts": "20260530_1740", "results": {"m4": "FAIL", "api_routes": "", "audio": "PASS via /generate", "video": "FAIL:{'status': 'error', 'error': 'it__\\n    ", "3d": "FAIL:{'status': 'generating', 'info': 'INSTAL", "image": "PASS url=http://192.168.10.94:3333/file/img_20260", "ct108": "200:79701", "vntworld": "200:80620"}}
