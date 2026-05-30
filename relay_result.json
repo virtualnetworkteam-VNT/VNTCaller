@@ -1,16 +1,20 @@
 {
-  "ts": "20260530_1638",
+  "ts": "20260530_1649",
   "results": {
-    "msi_8888": "PASS 37885b",
-    "api_proxy": "PASS",
-    "ct108_dash": "PASS 37885b",
-    "ct108_app": "PASS 26396b",
-    "vntworld.com": "PASS 39308b",
-    "vnt_app": "PASS 27819b",
-    "MSI_portal": "PASS 37885b",
-    "MSI_api": "PASS 164b",
+    "ct108_api": "FAIL 0",
+    "dashboard": "PASS 79887b",
+    "app": "PASS",
+    "msi_api_proxy": "FAIL 0",
+    "ct108_internal": "FAIL 0 <urlopen error timed out>b",
+    "ct108_api_health": "FAIL 0 <urlopen error timed out>b",
+    "vntworld_dashboard": "FAIL 0 timed outb",
+    "vntworld_app": "FAIL 0 timed outb",
+    "vntworld_api": "FAIL 0 timed outb",
+    "msi_portal": "FAIL 0 timed outb",
+    "msi_api": "FAIL 0 timed outb",
     "nextcloud": "PASS 33702b",
-    "ct108_internal": "PASS 12946b",
-    "m4_api": "PASS"
+    "m4_api": "PASS",
+    "audio_ct108": "FAIL:HTTP Error 500: Internal Server Error",
+    "image_ct108": "PASS url=http://192.168.10.94:3333/file/img_20260"
   }
 }
