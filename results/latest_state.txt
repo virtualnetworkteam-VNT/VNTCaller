@@ -1,20 +1,24 @@
 =======================================================
-VERIFY ALIAS + RETRY BRAIN WIRING (clean)
+PHASE 2: R&D DEPT + FIX WEB SEARCH
 =======================================================
 
-[1] Alias status...
-  Alias :8443: {"agent": "Alias", "role": "CEO", "status": "active", "model": "llama-3.3-70b-versatile", 
-  Brain module wired: True
+[1] Fixing web search method...
+  Web search updated (DuckDuckGo API + Wikipedia)
+  Web test: Artificial intelligence The capability of computational systems to perform tasks
 
-[2] Brain module check...
-  Brain module: exists, valid syntax
-  Model picker: groq
-  Web search: returns empty (may need different search)
-  RAG chars: 1102
+[2] Building Rdev agent (:7793)...
+  Rdev written
 
-[3] Brain already wired - testing...
+[3] Building Sage agent (:7794)...
+  Sage written
 
-[4] Smart query test...
-  Alias: VNT operations are currently experiencing a disruption due to an Alias crash, caused by an address already in use error. I'm working to resolve the issue and re
+[4] Starting R&D department...
+  rdev-agent :7793: OK {"agent": "Rdev", "role": "R&D Developer", "status": "active
+  sage-agent :7794: OK {"agent": "Sage", "role": "Research Analyst", "status": "act
 
-  Agents: 17/17 | Brain wired: True
+[5] Testing Sage research...
+  Sage result: No results found
+
+[6] Adding R&D to Alias routing...
+
+  TOTAL AGENTS: 19/19 (added Rdev + Sage R&D dept)
